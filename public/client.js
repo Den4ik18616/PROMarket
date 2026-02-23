@@ -1,4 +1,4 @@
-// public/client.js – полная версия с мобильным меню и исправлениями
+// client.js – финальная версия с исправлением фильтров на мобильных
 
 // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
 let map, markersLayer;
@@ -173,6 +173,7 @@ function handleAuthAction() {
     updateMenuAuthText();
 }
 
+// ==================== ВХОД / РЕГИСТРАЦИЯ ====================
 async function doLogin() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-pass').value;
@@ -711,6 +712,8 @@ function toggleHamburgerMenu() {
     menu.classList.toggle('hidden');
 }
 document.getElementById('menu-toggle').onclick = toggleHamburgerMenu;
+
+// Закрытие меню при клике вне его
 document.addEventListener('click', (e) => {
     const menu = document.getElementById('hamburger-menu');
     const btn = document.getElementById('menu-toggle');
@@ -719,6 +722,7 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// Обновление текста в меню в зависимости от состояния
 function updateMenuAuthText() {
     const authItem = document.querySelector('#menu-auth-text');
     if (authItem) {
@@ -727,6 +731,7 @@ function updateMenuAuthText() {
 }
 updateMenuAuthText();
 
+// Тёмная тема (переключение)
 function toggleTheme() {
     const isDark = document.body.hasAttribute('data-theme');
     if (isDark) {
@@ -869,24 +874,29 @@ window.addEventListener('scroll', () => {
 document.getElementById('scrollTop').onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
 // ==================== УПРАВЛЕНИЕ САЙДБАРОМ НА МОБИЛЬНЫХ ====================
-document.getElementById('filter-toggle').onclick = () => {
-    document.querySelector('.sidebar').classList.toggle('open');
-};
-document.getElementById('sidebar-close').onclick = () => {
-    document.querySelector('.sidebar').classList.remove('open');
-};
-document.addEventListener('click', (e) => {
-    const sidebar = document.querySelector('.sidebar');
-    const filterBtn = document.getElementById('filter-toggle');
-    if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && !filterBtn.contains(e.target)) {
-        sidebar.classList.remove('open');
-    }
-});
-
 // Функция для открытия/закрытия сайдбара (используется в гамбургер-меню)
 function toggleSidebar() {
     document.querySelector('.sidebar').classList.toggle('open');
 }
+
+document.getElementById('filter-toggle').onclick = toggleSidebar;
+document.getElementById('sidebar-close').onclick = () => {
+    document.querySelector('.sidebar').classList.remove('open');
+};
+
+// Закрытие сайдбара при клике вне его (но не внутри гамбургер-меню)
+document.addEventListener('click', (e) => {
+    const sidebar = document.querySelector('.sidebar');
+    const filterBtn = document.getElementById('filter-toggle');
+    const hamburgerMenu = document.getElementById('hamburger-menu');
+    // Если клик был внутри гамбургер-меню, не закрываем сайдбар
+    if (hamburgerMenu && hamburgerMenu.contains(e.target)) {
+        return;
+    }
+    if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && !filterBtn.contains(e.target)) {
+        sidebar.classList.remove('open');
+    }
+});
 
 // ==================== ИНИЦИАЛИЗАЦИЯ ====================
 if (token) {

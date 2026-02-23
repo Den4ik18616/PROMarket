@@ -96,7 +96,7 @@
                 <button class="tab-btn" id="t-orders" onclick="showView('orders')">Мои заказы</button>
             </div>
             <div class="filter-content">
-                <!-- фильтры (без изменений) -->
+                <!-- фильтры -->
                 <div class="filter-group">
                     <label>Категория услуг</label>
                     <select id="f-cat" onchange="getPros()">
@@ -159,12 +159,60 @@
         </main>
     </div>
 
-    <!-- модальные окна (без изменений) -->
-    <div class="modal-bg" id="modal-auth">...</div>
-    <div class="modal-bg" id="modal-booking">...</div>
-    <div class="modal-bg" id="modal-notifications">...</div>
-    <div class="modal-bg" id="modal-chat">...</div>
-    <div id="compare-modal" class="modal-bg" style="display:none;">...</div>
+    <!-- модальные окна -->
+    <div class="modal-bg" id="modal-auth">
+        <div class="modal-box">
+            <h2>С возвращением!</h2>
+            <p style="color:var(--text-muted)">Введите данные для доступа к сервису</p>
+            <input type="email" id="auth-email" placeholder="Email">
+            <input type="password" id="auth-pass" placeholder="Пароль">
+            <button class="btn btn-primary" style="margin-top:25px" onclick="doLogin()">Продолжить</button>
+            <button class="btn btn-outline" style="width:100%; margin-top:12px" onclick="closeModal('modal-auth')">Закрыть</button>
+        </div>
+    </div>
+    <div class="modal-bg" id="modal-booking">
+        <div class="modal-box">
+            <h2>Оформление заказа</h2>
+            <p id="book-info" style="color:var(--primary); font-weight:700"></p>
+            <label>Дата визита</label>
+            <input type="date" id="book-date">
+            <label>Время</label>
+            <input type="time" id="book-time">
+            <label>Что нужно сделать?</label>
+            <textarea id="book-comment" rows="3" placeholder="Кратко опишите задачу..."></textarea>
+            <label>Промокод</label>
+            <input type="text" id="promo-code" placeholder="Введите промокод">
+            <div id="promo-message" style="font-size:0.8rem; color:red; margin:5px 0; min-height:20px;"></div>
+            <button class="btn btn-outline" onclick="applyPromo()">Применить промокод</button>
+            <button class="btn btn-primary" style="margin-top:25px" onclick="confirmBooking()">Забронировать мастеру</button>
+            <button class="btn btn-outline" style="width:100%; margin-top:12px" onclick="closeModal('modal-booking')">Отмена</button>
+        </div>
+    </div>
+    <div class="modal-bg" id="modal-notifications">
+        <div class="modal-box">
+            <h2>Уведомления</h2>
+            <div id="notifications-list"></div>
+            <button class="btn btn-outline" style="width:100%; margin-top:12px" onclick="closeModal('modal-notifications')">Закрыть</button>
+        </div>
+    </div>
+    <div class="modal-bg" id="modal-chat">
+        <div class="modal-box">
+            <h2 id="chat-with"></h2>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="chat-input" placeholder="Введите сообщение..." style="flex: 1;">
+                <button class="btn btn-primary" onclick="sendMessage()">Отправить</button>
+            </div>
+            <button class="btn btn-outline" style="width:100%; margin-top:12px" onclick="closeModal('modal-chat')">Закрыть</button>
+        </div>
+    </div>
+    <div id="compare-modal" class="modal-bg" style="display:none;">
+        <div class="modal-box" style="width:800px; max-width:95%;">
+            <h2>Сравнение мастеров</h2>
+            <div id="compare-content"></div>
+            <button class="btn btn-outline" onclick="closeCompareModal()">Закрыть</button>
+        </div>
+    </div>
 
     <div id="toast-container"></div>
     <button id="scrollTop" class="btn btn-primary" title="Наверх">↑</button>

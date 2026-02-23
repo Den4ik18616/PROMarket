@@ -1,5 +1,4 @@
-// client.js – финальная версия с поддержкой мобильных устройств, аватарками,
-// иконками сравнения, бейджами уведомлений на кнопке гамбургера и всеми функциями
+// client.js – финальная версия с исправлениями
 
 // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
 let map, markersLayer;
@@ -300,15 +299,17 @@ async function getPros() {
             // Аватарка (первая буква имени)
             const avatar = '<div class="avatar">' + p.name.charAt(0) + '</div>';
 
+            // Экранируем имя для onclick (заменяем апострофы)
+            const safeName = p.name.replace(/'/g, "\\'");
+
             let html = '<div class="card-header">' +
                 avatar +
                 '<span class="category-tag"><i class="fas ' + p.icon + '"></i> ' + p.category + '</span>' +
                 '<div style="display:flex; gap:5px;">' +
                 '<input type="checkbox" class="compare-checkbox" data-id="' + p.id + '" ' + (isSelected ? 'checked' : '') + ' onchange="toggleCompare(\'' + p.id + '\', this)" title="Выбрать для сравнения">' +
                 '<i class="fa' + (isFav ? 's' : 'r') + ' fa-heart fav-btn ' + (isFav ? 'active' : '') + '" onclick="toggleFav(\'' + p.id + '\', this)" title="' + (isFav ? 'Убрать из избранного' : 'Добавить в избранное') + '"></i>' +
-                '<i class="fas fa-share-alt" onclick="sharePro(\'' + p.id + '\', \'' + p.name + '\')" style="cursor:pointer; color:var(--text-muted);" title="Поделиться"></i>' +
+                '<i class="fas fa-share-alt" onclick="sharePro(\'' + p.id + '\', \'' + safeName + '\')" style="cursor:pointer; color:var(--text-muted);" title="Поделиться"></i>' +
                 '<i class="fas fa-compass compass-icon" onclick="centerMap(' + p.location.lat + ', ' + p.location.lng + ')" title="Показать на карте"></i>' +
-                '<i class="fas fa-balance-scale compare-icon ' + (isSelected ? 'active' : '') + '" onclick="toggleCompare(\'' + p.id + '\', this)" title="Сравнить"></i>' +
                 '</div>' +
                 '</div>' +
                 '<h3 style="margin:0 0 5px 0">' + p.name + ' ' + verifiedBadge + '</h3>' +
@@ -316,7 +317,7 @@ async function getPros() {
                 '<p style="font-size:0.85rem; color:var(--text-muted); margin:15px 0">' + p.desc + '</p>' +
                 distanceHtml +
                 '<div class="price">' + p.price + ' <span>₽/час</span></div>' +
-                '<button class="btn btn-primary" onclick="openBooking(\'' + p.id + '\', \'' + p.name + '\', ' + p.price + ')">Заказать услугу</button>' +
+                '<button class="btn btn-primary" onclick="openBooking(\'' + p.id + '\', \'' + safeName + '\', ' + p.price + ')">Заказать услугу</button>' +
                 '<button class="btn btn-outline" style="margin-top:10px" onclick="showToast(\'Чат с мастером в разработке\', \'info\')" title="Пока в разработке">Чат с мастером</button>';
 
             card.innerHTML = html;
@@ -346,7 +347,6 @@ function sharePro(id, name) {
 
 // ==================== БРОНИРОВАНИЕ ====================
 function openBooking(id, name, price) {
-    console.log('openBooking called', id, name, price); // для отладки
     if (!token) return openModal('modal-auth');
     currentPro = { id, name, price };
     document.getElementById('book-info').innerText = 'Выбор мастера: ' + name;

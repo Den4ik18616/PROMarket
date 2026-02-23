@@ -284,7 +284,7 @@ select, input[type="number"], input[type="text"] {
 .card-header {
     display: flex;
     justify-content: space-between;
-    align-items: center; /* выравнивание по вертикали */
+    align-items: center;
     margin-bottom: 15px;
 }
 .category-tag {
@@ -461,17 +461,49 @@ select, input[type="number"], input[type="text"] {
     gap: 10px;
     transition: background 0.2s;
     font-size: 1rem;
+    position: relative;
 }
 .hamburger-menu li:last-child { border-bottom: none; }
 .hamburger-menu li:hover { background: #f1f5f9; }
 [data-theme="dark"] .hamburger-menu li:hover { background: #1e293b; }
+.hamburger-menu li .badge {
+    position: static;
+    margin-left: auto;
+    background: var(--danger);
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+}
 
+/* Стили для бейджа на кнопке гамбургер */
+#menu-toggle {
+    position: relative;
+}
+#hamburger-notif-count {
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(30%, -30%);
+}
+
+/* Чекбокс сравнения */
 .compare-checkbox {
     margin-right: 10px;
     width: 18px;
     height: 18px;
     cursor: pointer;
 }
+/* Иконка сравнения (скрыта на ПК, видна на мобильных) */
+.compare-icon {
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: color 0.2s;
+}
+.compare-icon.active {
+    color: var(--primary);
+}
+.compare-icon:hover { color: var(--primary); }
 
 .compass-icon {
     cursor: pointer;
@@ -522,7 +554,7 @@ select, input[type="number"], input[type="text"] {
     color: var(--text-muted);
 }
 
-/* Аватарка для карточки */
+/* Аватарка */
 .avatar {
     width: 40px;
     height: 40px;
@@ -564,7 +596,7 @@ select, input[type="number"], input[type="text"] {
         font-size: 0.9rem;
     }
     .notification-badge {
-        margin-right: 0;
+        display: none; /* скрываем колокольчик в шапке */
     }
     #menu-toggle {
         background: var(--primary);
@@ -613,7 +645,7 @@ select, input[type="number"], input[type="text"] {
     }
     .main {
         margin-left: 0;
-        padding: 15px;
+        padding: 10px;
         width: 100%;
     }
     .styled-map {
@@ -622,24 +654,27 @@ select, input[type="number"], input[type="text"] {
     }
     .grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
+        gap: 8px;
     }
     .card {
-        padding: 12px;
+        padding: 8px;
         box-shadow: none;
         border: 1px solid rgba(0,0,0,0.05);
     }
     .card h3 {
-        font-size: 1rem;
-        margin: 5px 0;
+        font-size: 0.9rem;
+        margin: 3px 0;
     }
     .category-tag {
-        font-size: 0.6rem;
-        padding: 2px 6px;
+        font-size: 0.55rem;
+        padding: 2px 4px;
     }
     .price {
-        font-size: 1.2rem;
-        margin: 5px 0;
+        font-size: 1rem;
+        margin: 3px 0;
+    }
+    .price span {
+        font-size: 0.7rem;
     }
     .card p {
         display: none;
@@ -648,42 +683,47 @@ select, input[type="number"], input[type="text"] {
         display: none;
     }
     .btn-primary {
-        padding: 8px;
-        font-size: 0.8rem;
-        min-height: 36px;
+        padding: 6px;
+        font-size: 0.7rem;
+        min-height: 32px;
     }
     .card-header {
         margin-bottom: 5px;
+        align-items: center;
     }
-    .fav-btn {
-        font-size: 1rem;
-    }
-    .compass-icon {
-        font-size: 1rem;
-    }
-    .compare-checkbox {
-        width: 16px;
-        height: 16px;
+    .fav-btn,
+    .compass-icon,
+    .fa-share-alt,
+    .compare-icon {
+        font-size: 0.9rem;
+        min-height: 36px;
+        min-width: 36px;
     }
     .distanceHtml {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
     }
-    .btn, .fav-btn, .compare-checkbox, .compass-icon {
-        min-height: 44px;
-        min-width: 44px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+    .btn, .fav-btn, .compare-checkbox, .compass-icon, .compare-icon {
+        min-height: 36px;
+        min-width: 36px;
     }
+    /* На мобильных скрываем чекбокс, показываем иконку сравнения */
     .compare-checkbox {
-        transform: scale(1.2);
-        margin-right: 5px;
+        display: none;
+    }
+    .compare-icon {
+        display: inline-flex;
+    }
+    .avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+        margin-right: 6px;
     }
     #scrollTop {
-        width: 40px;
-        height: 40px;
-        bottom: 15px;
-        right: 15px;
+        width: 36px;
+        height: 36px;
+        bottom: 10px;
+        right: 10px;
         opacity: 0.6;
     }
     #scrollTop:hover {
@@ -708,13 +748,25 @@ select, input[type="number"], input[type="text"] {
     font-size: 1.2rem;
 }
 .mobile .search-bar {
+    background: transparent; /* убираем серый фон */
+    border: none; /* убираем обводку */
     width: auto;
     flex: 1;
     margin: 0 5px;
-    max-width: 140px; /* уменьшили ширину поиска */
+    max-width: 140px;
+    padding: 0; /* убираем внутренние отступы */
 }
 .mobile .search-bar input {
     font-size: 0.8rem;
+    background: transparent;
+    border: none;
+    outline: none;
+    width: 100%;
+    margin-left: 5px;
+    color: var(--text-main);
+}
+.mobile .search-bar i {
+    color: var(--text-muted);
 }
 .mobile .desktop-only {
     display: none;
@@ -725,7 +777,7 @@ select, input[type="number"], input[type="text"] {
     font-size: 0.9rem;
 }
 .mobile .notification-badge {
-    margin-right: 0;
+    display: none; /* скрываем колокольчик в шапке */
 }
 .mobile #menu-toggle {
     background: var(--primary);
@@ -734,6 +786,13 @@ select, input[type="number"], input[type="text"] {
     width: 48px;
     height: 48px;
     padding: 0;
+    position: relative;
+}
+.mobile #hamburger-notif-count {
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(30%, -30%);
 }
 .mobile .sidebar {
     position: fixed;
@@ -822,7 +881,8 @@ select, input[type="number"], input[type="text"] {
 }
 .mobile .fav-btn,
 .mobile .compass-icon,
-.mobile .fa-share-alt {
+.mobile .fa-share-alt,
+.mobile .compare-icon {
     font-size: 0.9rem;
     min-height: 36px;
     min-width: 36px;
@@ -830,23 +890,21 @@ select, input[type="number"], input[type="text"] {
 .mobile .distanceHtml {
     font-size: 0.65rem;
 }
-.mobile .btn, .mobile .fav-btn, .mobile .compare-checkbox, .mobile .compass-icon {
+.mobile .btn, .mobile .fav-btn, .mobile .compare-checkbox, .mobile .compass-icon, .mobile .compare-icon {
     min-height: 36px;
     min-width: 36px;
 }
 .mobile .compare-checkbox {
-    display: none; /* скрываем чекбокс, вместо него аватарка */
+    display: none;
+}
+.mobile .compare-icon {
+    display: inline-flex;
 }
 .mobile .avatar {
     width: 32px;
     height: 32px;
     font-size: 1rem;
     margin-right: 6px;
-}
-.mobile .fa-share-alt,
-.mobile .fav-btn,
-.mobile .compass-icon {
-    margin-left: 3px;
 }
 .mobile #scrollTop {
     width: 36px;
@@ -866,6 +924,11 @@ select, input[type="number"], input[type="text"] {
     background: var(--primary);
     width: 0%;
     transition: width 0.1s;
+}
+/* Стили для пункта уведомлений в меню */
+.mobile .hamburger-menu li .badge {
+    position: static;
+    margin-left: auto;
 }
 
 .hidden { display: none; }

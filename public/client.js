@@ -1,4 +1,4 @@
-// client.js – финальная версия с аватарками и компактными карточками
+// client.js – финальная версия с улучшениями для мобильных
 
 // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
 let map, markersLayer;
@@ -11,6 +11,7 @@ let ws = null;
 let pros = [];
 let userLocation = null;
 let currentRatingComplete = 0;
+let selectedForCompare = JSON.parse(localStorage.getItem('compare') || '[]'); // массив для сравнения на мобильных
 
 const cancelReasons = [
     'Передумал',
@@ -151,6 +152,19 @@ function toggleFav(id, el) {
     }
 }
 
+// ==================== СРАВНЕНИЕ (ДЛЯ МОБИЛЬНЫХ) ====================
+function toggleCompare(id, el) {
+    const index = selectedForCompare.indexOf(id);
+    if (index === -1) {
+        selectedForCompare.push(id);
+        el.classList.add('active');
+    } else {
+        selectedForCompare.splice(index, 1);
+        el.classList.remove('active');
+    }
+    localStorage.setItem('compare', JSON.stringify(selectedForCompare));
+}
+
 // ==================== МОДАЛЬНЫЕ ОКНА ====================
 function openModal(id) {
     document.getElementById(id).style.display = 'flex';
@@ -268,6 +282,7 @@ async function getPros() {
         pros.forEach((p, idx) => {
             const isFav = favorites.includes(p.id);
             const verifiedBadge = p.verified ? '<i class="fas fa-check-circle verified-badge" title="Проверенный мастер"></i>' : '';
+            const isSelected = selectedForCompare.includes(p.id);
 
             let distanceHtml = '';
             if (userLocation) {
@@ -281,16 +296,18 @@ async function getPros() {
             card.className = 'card';
             card.style.animationDelay = idx * 0.05 + 's';
 
-            // Аватарка (первая буква имени)
+            // Аватарка
             const avatar = '<div class="avatar">' + p.name.charAt(0) + '</div>';
 
             let html = '<div class="card-header">' +
                 avatar +
                 '<span class="category-tag"><i class="fas ' + p.icon + '"></i> ' + p.category + '</span>' +
                 '<div style="display:flex; gap:5px;">' +
+                '<input type="checkbox" class="compare-checkbox" data-id="' + p.id + '" ' + (isSelected ? 'checked' : '') + ' onchange="toggleCompare(\'' + p.id + '\', this)" title="Выбрать для сравнения">' +
                 '<i class="fa' + (isFav ? 's' : 'r') + ' fa-heart fav-btn ' + (isFav ? 'active' : '') + '" onclick="toggleFav(\'' + p.id + '\', this)" title="' + (isFav ? 'Убрать из избранного' : 'Добавить в избранное') + '"></i>' +
                 '<i class="fas fa-share-alt" onclick="sharePro(\'' + p.id + '\', \'' + p.name + '\')" style="cursor:pointer; color:var(--text-muted);" title="Поделиться"></i>' +
                 '<i class="fas fa-compass compass-icon" onclick="centerMap(' + p.location.lat + ', ' + p.location.lng + ')" title="Показать на карте"></i>' +
+                '<i class="fas fa-balance-scale compare-icon ' + (isSelected ? 'active' : '') + '" onclick="toggleCompare(\'' + p.id + '\', this)" title="Сравнить"></i>' +
                 '</div>' +
                 '</div>' +
                 '<h3 style="margin:0 0 5px 0">' + p.name + ' ' + verifiedBadge + '</h3>' +
@@ -328,6 +345,7 @@ function sharePro(id, name) {
 
 // ==================== БРОНИРОВАНИЕ ====================
 function openBooking(id, name, price) {
+    console.log('openBooking called', id, name, price); // для отладки
     if (!token) return openModal('modal-auth');
     currentPro = { id, name, price };
     document.getElementById('book-info').innerText = 'Выбор мастера: ' + name;
@@ -483,17 +501,47 @@ async function fetchNotifications() {
         if (!res.ok) throw new Error('Ошибка загрузки');
         const notifs = await res.json();
         const count = notifs.length;
-        const badge = document.getElementById('notificationCount');
-        if (count > 0) {
-            badge.classList.remove('hidden');
-            badge.innerText = count;
-            if (count > lastNotifCount) {
-                const bell = document.getElementById('notificationBell').querySelector('i');
+        
+        // Обновляем бейдж колокольчика (на ПК)
+        const bellBadge = document.getElementById('notificationCount');
+        if (bellBadge) {
+            if (count > 0) {
+                bellBadge.classList.remove('hidden');
+                bellBadge.innerText = count;
+            } else {
+                bellBadge.classList.add('hidden');
+            }
+        }
+
+        // Обновляем бейдж на кнопке гамбургер
+        const hamburgerBadge = document.getElementById('hamburger-notif-count');
+        if (hamburgerBadge) {
+            if (count > 0) {
+                hamburgerBadge.classList.remove('hidden');
+                hamburgerBadge.innerText = count;
+            } else {
+                hamburgerBadge.classList.add('hidden');
+            }
+        }
+
+        // Обновляем бейдж в меню
+        const menuBadge = document.getElementById('menu-notif-count');
+        if (menuBadge) {
+            if (count > 0) {
+                menuBadge.classList.remove('hidden');
+                menuBadge.innerText = count;
+            } else {
+                menuBadge.classList.add('hidden');
+            }
+        }
+
+        // Анимация колокольчика при новых уведомлениях (только если колокольчик виден)
+        if (count > lastNotifCount) {
+            const bell = document.getElementById('notificationBell')?.querySelector('i');
+            if (bell) {
                 bell.style.animation = 'bell-shake 0.5s';
                 setTimeout(() => bell.style.animation = '', 500);
             }
-        } else {
-            badge.classList.add('hidden');
         }
         lastNotifCount = count;
         return notifs;
@@ -818,16 +866,24 @@ function showAbout() {
 }
 
 // ==================== СРАВНЕНИЕ МАСТЕРОВ ====================
-document.getElementById('compare-btn').onclick = compareMasters;
-
 function compareMasters() {
-    const checkboxes = document.querySelectorAll('.compare-checkbox:checked');
-    const selectedIds = Array.from(checkboxes).map(cb => cb.dataset.id);
-    if (selectedIds.length < 2) {
+    const isMobile = document.documentElement.classList.contains('mobile');
+    let selectedMasters = [];
+
+    if (isMobile) {
+        // На мобильных используем массив selectedForCompare
+        selectedMasters = pros.filter(p => selectedForCompare.includes(p.id));
+    } else {
+        // На ПК используем чекбоксы
+        const checkboxes = document.querySelectorAll('.compare-checkbox:checked');
+        const selectedIds = Array.from(checkboxes).map(cb => cb.dataset.id);
+        selectedMasters = pros.filter(p => selectedIds.includes(p.id));
+    }
+
+    if (selectedMasters.length < 2) {
         showToast('Выберите хотя бы двух мастеров для сравнения', 'error');
         return;
     }
-    const selectedMasters = pros.filter(p => selectedIds.includes(p.id));
     showCompareModal(selectedMasters);
 }
 

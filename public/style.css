@@ -284,7 +284,7 @@ select, input[type="number"], input[type="text"] {
 .card-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center; /* выравнивание по вертикали */
     margin-bottom: 15px;
 }
 .category-tag {
@@ -522,6 +522,22 @@ select, input[type="number"], input[type="text"] {
     color: var(--text-muted);
 }
 
+/* Аватарка для карточки */
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
 /* ========== АДАПТИВНОСТЬ (МЕДИА-ЗАПРОСЫ) ========== */
 @media (max-width: 768px) {
     header {
@@ -695,7 +711,7 @@ select, input[type="number"], input[type="text"] {
     width: auto;
     flex: 1;
     margin: 0 5px;
-    max-width: 200px;
+    max-width: 140px; /* уменьшили ширину поиска */
 }
 .mobile .search-bar input {
     font-size: 0.8rem;
@@ -758,7 +774,7 @@ select, input[type="number"], input[type="text"] {
 }
 .mobile .main {
     margin-left: 0;
-    padding: 15px;
+    padding: 10px;
     width: 100%;
 }
 .mobile .styled-map {
@@ -767,24 +783,27 @@ select, input[type="number"], input[type="text"] {
 }
 .mobile .grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 8px;
 }
 .mobile .card {
-    padding: 12px;
+    padding: 8px;
     box-shadow: none;
     border: 1px solid rgba(0,0,0,0.05);
 }
 .mobile .card h3 {
-    font-size: 1rem;
-    margin: 5px 0;
+    font-size: 0.9rem;
+    margin: 3px 0;
 }
 .mobile .category-tag {
-    font-size: 0.6rem;
-    padding: 2px 6px;
+    font-size: 0.55rem;
+    padding: 2px 4px;
 }
 .mobile .price {
-    font-size: 1.2rem;
-    margin: 5px 0;
+    font-size: 1rem;
+    margin: 3px 0;
+}
+.mobile .price span {
+    font-size: 0.7rem;
 }
 .mobile .card p {
     display: none;
@@ -793,42 +812,47 @@ select, input[type="number"], input[type="text"] {
     display: none;
 }
 .mobile .btn-primary {
-    padding: 8px;
-    font-size: 0.8rem;
-    min-height: 36px;
+    padding: 6px;
+    font-size: 0.7rem;
+    min-height: 32px;
 }
 .mobile .card-header {
     margin-bottom: 5px;
+    align-items: center;
 }
-.mobile .fav-btn {
-    font-size: 1rem;
-}
-.mobile .compass-icon {
-    font-size: 1rem;
-}
-.mobile .compare-checkbox {
-    width: 16px;
-    height: 16px;
+.mobile .fav-btn,
+.mobile .compass-icon,
+.mobile .fa-share-alt {
+    font-size: 0.9rem;
+    min-height: 36px;
+    min-width: 36px;
 }
 .mobile .distanceHtml {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
 }
 .mobile .btn, .mobile .fav-btn, .mobile .compare-checkbox, .mobile .compass-icon {
-    min-height: 44px;
-    min-width: 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    min-height: 36px;
+    min-width: 36px;
 }
 .mobile .compare-checkbox {
-    transform: scale(1.2);
-    margin-right: 5px;
+    display: none; /* скрываем чекбокс, вместо него аватарка */
+}
+.mobile .avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+    margin-right: 6px;
+}
+.mobile .fa-share-alt,
+.mobile .fav-btn,
+.mobile .compass-icon {
+    margin-left: 3px;
 }
 .mobile #scrollTop {
-    width: 40px;
-    height: 40px;
-    bottom: 15px;
-    right: 15px;
+    width: 36px;
+    height: 36px;
+    bottom: 10px;
+    right: 10px;
     opacity: 0.6;
 }
 .mobile #scrollTop:hover {

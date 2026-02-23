@@ -4,6 +4,14 @@
     <meta charset="utf-8">
     <title>PROMarket — Premium Service</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script>
+        (function() {
+            var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isMobile || window.innerWidth < 768) {
+                document.documentElement.classList.add('mobile');
+            }
+        })();
+    </script>
     <!-- Leaflet CSS и JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -80,7 +88,7 @@
                 <button class="tab-btn" id="t-orders" onclick="showView('orders')">Мои заказы</button>
             </div>
             <div class="filter-content">
-                <!-- фильтры -->
+                <!-- фильтры (без изменений) -->
                 <div class="filter-group">
                     <label>Категория услуг</label>
                     <select id="f-cat" onchange="getPros()">

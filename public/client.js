@@ -1,4 +1,4 @@
-// client.js – финальная версия с определением мобильного устройства
+// client.js – финальная версия с аватарками и компактными карточками
 
 // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
 let map, markersLayer;
@@ -281,10 +281,13 @@ async function getPros() {
             card.className = 'card';
             card.style.animationDelay = idx * 0.05 + 's';
 
+            // Аватарка (первая буква имени)
+            const avatar = '<div class="avatar">' + p.name.charAt(0) + '</div>';
+
             let html = '<div class="card-header">' +
-                '<input type="checkbox" class="compare-checkbox" data-id="' + p.id + '" title="Выбрать для сравнения">' +
+                avatar +
                 '<span class="category-tag"><i class="fas ' + p.icon + '"></i> ' + p.category + '</span>' +
-                '<div style="display:flex; gap:10px;">' +
+                '<div style="display:flex; gap:5px;">' +
                 '<i class="fa' + (isFav ? 's' : 'r') + ' fa-heart fav-btn ' + (isFav ? 'active' : '') + '" onclick="toggleFav(\'' + p.id + '\', this)" title="' + (isFav ? 'Убрать из избранного' : 'Добавить в избранное') + '"></i>' +
                 '<i class="fas fa-share-alt" onclick="sharePro(\'' + p.id + '\', \'' + p.name + '\')" style="cursor:pointer; color:var(--text-muted);" title="Поделиться"></i>' +
                 '<i class="fas fa-compass compass-icon" onclick="centerMap(' + p.location.lat + ', ' + p.location.lng + ')" title="Показать на карте"></i>' +
@@ -915,16 +918,6 @@ if (prosList) {
         document.getElementById('scroll-indicator').style.width = scrollPercent + '%';
     });
 }
-
-// ==================== ОПРЕДЕЛЕНИЕ МОБИЛЬНОГО УСТРОЙСТВА ====================
-function detectMobile() {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (isMobile || window.innerWidth < 768) {
-        document.body.classList.add('mobile');
-    }
-    console.log('window width:', window.innerWidth, 'isMobile:', isMobile);
-}
-detectMobile();
 
 // ==================== ИНИЦИАЛИЗАЦИЯ ====================
 if (token) {

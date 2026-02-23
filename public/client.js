@@ -1,4 +1,4 @@
-// client.js – финальная версия с исправлением фильтров на мобильных
+// client.js – финальная версия с определением мобильного устройства
 
 // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
 let map, markersLayer;
@@ -45,7 +45,7 @@ particlesJS('particles-js', {
     }
 });
 
-// ==================== LEAFLET КАРТА (спутник) ====================
+// ==================== LEAFLET КАРТА ====================
 function initMap() {
     map = L.map('map').setView([55.75, 37.61], 10);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -274,7 +274,7 @@ async function getPros() {
                 const from = L.latLng(userLocation.lat, userLocation.lng);
                 const to = L.latLng(p.location.lat, p.location.lng);
                 const distKm = from.distanceTo(to) / 1000;
-                distanceHtml = '<div style="font-size:0.8rem; color:var(--text-muted); margin-top:5px">🚗 ' + distKm.toFixed(1) + ' км</div>';
+                distanceHtml = '<div class="distanceHtml" style="font-size:0.8rem; color:var(--text-muted); margin-top:5px">🚗 ' + distKm.toFixed(1) + ' км</div>';
             }
 
             const card = document.createElement('div');
@@ -713,7 +713,6 @@ function toggleHamburgerMenu() {
 }
 document.getElementById('menu-toggle').onclick = toggleHamburgerMenu;
 
-// Закрытие меню при клике вне его
 document.addEventListener('click', (e) => {
     const menu = document.getElementById('hamburger-menu');
     const btn = document.getElementById('menu-toggle');
@@ -722,7 +721,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Обновление текста в меню в зависимости от состояния
 function updateMenuAuthText() {
     const authItem = document.querySelector('#menu-auth-text');
     if (authItem) {
@@ -731,7 +729,6 @@ function updateMenuAuthText() {
 }
 updateMenuAuthText();
 
-// Тёмная тема (переключение)
 function toggleTheme() {
     const isDark = document.body.hasAttribute('data-theme');
     if (isDark) {
@@ -873,23 +870,19 @@ window.addEventListener('scroll', () => {
 });
 document.getElementById('scrollTop').onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-// ==================== УПРАВЛЕНИЕ САЙДБАРОМ НА МОБИЛЬНЫХ ====================
-// Функция для открытия/закрытия сайдбара (используется в гамбургер-меню)
+// ==================== УПРАВЛЕНИЕ САЙДБАРОМ ====================
 function toggleSidebar() {
     document.querySelector('.sidebar').classList.toggle('open');
 }
-
 document.getElementById('filter-toggle').onclick = toggleSidebar;
 document.getElementById('sidebar-close').onclick = () => {
     document.querySelector('.sidebar').classList.remove('open');
 };
 
-// Закрытие сайдбара при клике вне его (но не внутри гамбургер-меню)
 document.addEventListener('click', (e) => {
     const sidebar = document.querySelector('.sidebar');
     const filterBtn = document.getElementById('filter-toggle');
     const hamburgerMenu = document.getElementById('hamburger-menu');
-    // Если клик был внутри гамбургер-меню, не закрываем сайдбар
     if (hamburgerMenu && hamburgerMenu.contains(e.target)) {
         return;
     }
@@ -897,6 +890,41 @@ document.addEventListener('click', (e) => {
         sidebar.classList.remove('open');
     }
 });
+
+// ==================== СВАЙП ДЛЯ ЗАКРЫТИЯ САЙДБАРА ====================
+let touchstartX = 0;
+let touchendX = 0;
+const sidebarEl = document.querySelector('.sidebar');
+if (sidebarEl) {
+    sidebarEl.addEventListener('touchstart', e => {
+        touchstartX = e.changedTouches[0].screenX;
+    });
+    sidebarEl.addEventListener('touchend', e => {
+        touchendX = e.changedTouches[0].screenX;
+        if (touchendX < touchstartX - 50) {
+            sidebarEl.classList.remove('open');
+        }
+    });
+}
+
+// ==================== ИНДИКАТОР ПРОКРУТКИ ====================
+const prosList = document.getElementById('pros-list');
+if (prosList) {
+    prosList.addEventListener('scroll', () => {
+        const scrollPercent = (prosList.scrollTop / (prosList.scrollHeight - prosList.clientHeight)) * 100;
+        document.getElementById('scroll-indicator').style.width = scrollPercent + '%';
+    });
+}
+
+// ==================== ОПРЕДЕЛЕНИЕ МОБИЛЬНОГО УСТРОЙСТВА ====================
+function detectMobile() {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile || window.innerWidth < 768) {
+        document.body.classList.add('mobile');
+    }
+    console.log('window width:', window.innerWidth, 'isMobile:', isMobile);
+}
+detectMobile();
 
 // ==================== ИНИЦИАЛИЗАЦИЯ ====================
 if (token) {

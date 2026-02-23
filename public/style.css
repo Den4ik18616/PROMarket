@@ -1,4 +1,3 @@
-/* public/style.css */
 :root {
     --primary: #4f46e5; --primary-hover: #4338ca;
     --bg: #f8fafc; --card: #ffffff;
@@ -523,6 +522,7 @@ select, input[type="number"], input[type="text"] {
     color: var(--text-muted);
 }
 
+/* ========== АДАПТИВНОСТЬ (МЕДИА-ЗАПРОСЫ) ========== */
 @media (max-width: 768px) {
     header {
         padding: 0 10px;
@@ -550,6 +550,14 @@ select, input[type="number"], input[type="text"] {
     .notification-badge {
         margin-right: 0;
     }
+    #menu-toggle {
+        background: var(--primary);
+        color: white;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        padding: 0;
+    }
     .sidebar {
         position: fixed;
         top: 72px;
@@ -559,12 +567,29 @@ select, input[type="number"], input[type="text"] {
         background: var(--card);
         z-index: 1001;
         transform: translateX(-100%);
-        transition: transform 0.3s ease;
+        transition: transform 0.3s ease-in-out;
         overflow-y: auto;
         box-shadow: 2px 0 10px rgba(0,0,0,0.2);
     }
     .sidebar.open {
         transform: translateX(0);
+    }
+    .sidebar.open ~ .main::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.4);
+        z-index: 1000;
+        pointer-events: none;
+        opacity: 1;
+        transition: opacity 0.3s;
+    }
+    .sidebar ~ .main::after {
+        opacity: 0;
+        transition: opacity 0.3s;
     }
     #sidebar-close {
         align-self: flex-end;
@@ -577,51 +602,246 @@ select, input[type="number"], input[type="text"] {
     }
     .styled-map {
         height: 200px;
+        box-shadow: none;
     }
     .grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
     }
     .card {
-        padding: 15px;
+        padding: 12px;
+        box-shadow: none;
+        border: 1px solid rgba(0,0,0,0.05);
     }
     .card h3 {
         font-size: 1rem;
+        margin: 5px 0;
     }
     .category-tag {
         font-size: 0.6rem;
+        padding: 2px 6px;
     }
     .price {
-        font-size: 1.4rem;
+        font-size: 1.2rem;
+        margin: 5px 0;
     }
-    .btn-primary, .btn-outline {
-        min-height: 44px;
-        font-size: 0.9rem;
+    .card p {
+        display: none;
     }
-    .hamburger-menu {
-        top: 60px;
-        right: 5px;
-        min-width: 200px;
+    .card .btn-outline:last-child {
+        display: none;
     }
-    .hamburger-menu li {
-        padding: 15px 20px;
-        font-size: 0.95rem;
+    .btn-primary {
+        padding: 8px;
+        font-size: 0.8rem;
+        min-height: 36px;
+    }
+    .card-header {
+        margin-bottom: 5px;
+    }
+    .fav-btn {
+        font-size: 1rem;
+    }
+    .compass-icon {
+        font-size: 1rem;
     }
     .compare-checkbox {
-        width: 20px;
-        height: 20px;
+        width: 16px;
+        height: 16px;
     }
-    .sidebar.open ~ .main::after {
-        content: '';
-        position: fixed;
-        top: 0;
+    .distanceHtml {
+        font-size: 0.7rem;
+    }
+    .btn, .fav-btn, .compare-checkbox, .compass-icon {
+        min-height: 44px;
+        min-width: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .compare-checkbox {
+        transform: scale(1.2);
+        margin-right: 5px;
+    }
+    #scrollTop {
+        width: 40px;
+        height: 40px;
+        bottom: 15px;
+        right: 15px;
+        opacity: 0.6;
+    }
+    #scrollTop:hover {
+        opacity: 1;
+    }
+    #scroll-indicator {
+        position: sticky;
+        bottom: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.3);
-        z-index: 1000;
-        pointer-events: none;
+        height: 3px;
+        background: var(--primary);
+        width: 0%;
+        transition: width 0.1s;
     }
+}
+
+/* ========== СТИЛИ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ПО КЛАССУ .mobile ========== */
+.mobile header {
+    padding: 0 10px;
+}
+.mobile .logo {
+    font-size: 1.2rem;
+}
+.mobile .search-bar {
+    width: auto;
+    flex: 1;
+    margin: 0 5px;
+    max-width: 200px;
+}
+.mobile .search-bar input {
+    font-size: 0.8rem;
+}
+.mobile .desktop-only {
+    display: none;
+}
+.mobile .btn-outline {
+    padding: 8px 10px;
+    margin-left: 3px !important;
+    font-size: 0.9rem;
+}
+.mobile .notification-badge {
+    margin-right: 0;
+}
+.mobile #menu-toggle {
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+}
+.mobile .sidebar {
+    position: fixed;
+    top: 72px;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 72px);
+    background: var(--card);
+    z-index: 1001;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    overflow-y: auto;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+}
+.mobile .sidebar.open {
+    transform: translateX(0);
+}
+.mobile .sidebar.open ~ .main::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+.mobile .sidebar ~ .main::after {
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.mobile #sidebar-close {
+    align-self: flex-end;
+    margin: 5px;
+}
+.mobile .main {
+    margin-left: 0;
+    padding: 15px;
+    width: 100%;
+}
+.mobile .styled-map {
+    height: 200px;
+    box-shadow: none;
+}
+.mobile .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+.mobile .card {
+    padding: 12px;
+    box-shadow: none;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+.mobile .card h3 {
+    font-size: 1rem;
+    margin: 5px 0;
+}
+.mobile .category-tag {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+}
+.mobile .price {
+    font-size: 1.2rem;
+    margin: 5px 0;
+}
+.mobile .card p {
+    display: none;
+}
+.mobile .card .btn-outline:last-child {
+    display: none;
+}
+.mobile .btn-primary {
+    padding: 8px;
+    font-size: 0.8rem;
+    min-height: 36px;
+}
+.mobile .card-header {
+    margin-bottom: 5px;
+}
+.mobile .fav-btn {
+    font-size: 1rem;
+}
+.mobile .compass-icon {
+    font-size: 1rem;
+}
+.mobile .compare-checkbox {
+    width: 16px;
+    height: 16px;
+}
+.mobile .distanceHtml {
+    font-size: 0.7rem;
+}
+.mobile .btn, .mobile .fav-btn, .mobile .compare-checkbox, .mobile .compass-icon {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.mobile .compare-checkbox {
+    transform: scale(1.2);
+    margin-right: 5px;
+}
+.mobile #scrollTop {
+    width: 40px;
+    height: 40px;
+    bottom: 15px;
+    right: 15px;
+    opacity: 0.6;
+}
+.mobile #scrollTop:hover {
+    opacity: 1;
+}
+.mobile #scroll-indicator {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--primary);
+    width: 0%;
+    transition: width 0.1s;
 }
 
 .hidden { display: none; }

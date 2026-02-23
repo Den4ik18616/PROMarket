@@ -70,7 +70,7 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 40px;
+    padding: 0 20px;
     border-bottom: 1px solid #e2e8f0;
     position: fixed;
     top: 0;
@@ -91,6 +91,8 @@ header {
     display: flex;
     align-items: center;
     gap: 10px;
+    cursor: pointer;
+    white-space: nowrap;
 }
 .search-bar {
     background: #f1f5f9;
@@ -100,6 +102,7 @@ header {
     align-items: center;
     width: 350px;
     transition: 0.3s;
+    margin: 0 10px;
 }
 .search-bar:focus-within {
     background: #fff;
@@ -123,7 +126,7 @@ header {
 /* Уведомления */
 .notification-badge {
     position: relative;
-    margin-right: 15px;
+    margin-right: 5px;
     cursor: pointer;
 }
 .badge {
@@ -454,7 +457,7 @@ select, input[type="number"], input[type="text"] {
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     z-index: 1100;
-    min-width: 200px;
+    min-width: 220px;
 }
 .hamburger-menu ul {
     list-style: none;
@@ -469,6 +472,7 @@ select, input[type="number"], input[type="text"] {
     align-items: center;
     gap: 10px;
     transition: background 0.2s;
+    font-size: 1rem;
 }
 .hamburger-menu li:last-child { border-bottom: none; }
 .hamburger-menu li:hover { background: #f1f5f9; }
@@ -547,24 +551,23 @@ select, input[type="number"], input[type="text"] {
     .search-bar {
         width: auto;
         flex: 1;
-        margin-left: 5px;
+        margin: 0 5px;
         max-width: 200px;
     }
     .search-bar input {
         font-size: 0.8rem;
     }
-    /* Скрываем текст в кнопках */
-    #authBtn span {
+    /* Скрываем десктопные кнопки */
+    .desktop-only {
         display: none;
     }
-    /* Компактные кнопки */
     .btn-outline {
         padding: 8px 10px;
         margin-left: 3px !important;
         font-size: 0.9rem;
     }
     .notification-badge {
-        margin-right: 5px;
+        margin-right: 0;
     }
     /* Сайдбар скрыт по умолчанию */
     .sidebar {
@@ -583,7 +586,6 @@ select, input[type="number"], input[type="text"] {
     .sidebar.open {
         transform: translateX(0);
     }
-    /* Кнопка закрытия сайдбара */
     #sidebar-close {
         align-self: flex-end;
         margin: 5px;
@@ -600,31 +602,36 @@ select, input[type="number"], input[type="text"] {
         grid-template-columns: 1fr;
         gap: 15px;
     }
+    /* Уменьшаем карточки */
     .card {
         padding: 15px;
     }
     .card h3 {
-        font-size: 1.1rem;
+        font-size: 1rem;
+    }
+    .category-tag {
+        font-size: 0.6rem;
     }
     .price {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
     }
     .btn-primary, .btn-outline {
-        min-height: 48px;
-        font-size: 1rem;
+        min-height: 44px;
+        font-size: 0.9rem;
     }
     .hamburger-menu {
         top: 60px;
         right: 5px;
+        min-width: 200px;
     }
     .hamburger-menu li {
         padding: 15px 20px;
+        font-size: 0.95rem;
     }
     .compare-checkbox {
         width: 20px;
         height: 20px;
     }
-    /* Затемнение фона при открытом сайдбаре */
     .sidebar.open ~ .main::after {
         content: '';
         position: fixed;
@@ -635,24 +642,6 @@ select, input[type="number"], input[type="text"] {
         background: rgba(0,0,0,0.3);
         z-index: 1000;
         pointer-events: none;
-    }
-}
-
-@media (max-width: 480px) {
-    .card h3 {
-        font-size: 1rem;
-    }
-    .category-tag {
-        font-size: 0.6rem;
-    }
-    .price {
-        font-size: 1.3rem;
-    }
-    .btn {
-        font-size: 0.9rem;
-    }
-    .search-bar {
-        max-width: 150px;
     }
 }
 

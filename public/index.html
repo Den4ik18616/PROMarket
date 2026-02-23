@@ -26,48 +26,53 @@
     <div id="progress-bar"></div>
 
     <header>
-        <div class="logo"><i class="fas fa-bolt"></i> PROMarket</div>
+        <div class="logo" onclick="showView('pros')" style="cursor: pointer;"><i class="fas fa-bolt"></i> PROMarket</div>
         <div class="search-bar">
             <i class="fas fa-search" style="color:#94a3b8"></i>
             <input type="text" id="main-search" placeholder="Поиск мастеров..." autofocus oninput="debounce(getPros, 500)()">
         </div>
         <div style="display: flex; align-items: center;">
+            <!-- Кнопка уведомлений остаётся всегда -->
             <div class="notification-badge" id="notificationBell" onclick="showNotifications()" title="Уведомления">
                 <i class="fas fa-bell fa-lg"></i>
                 <span class="badge hidden" id="notificationCount">0</span>
             </div>
-            <div id="auth-zone">
-                <button class="btn btn-outline" id="authBtn" onclick="handleAuthAction()" title="Войти / Выйти">
-                    <i class="fas fa-user-circle"></i> <span>Войти</span>
+            <!-- Кнопки, которые скрыты на мобильных (будут в гамбургере) -->
+            <div class="desktop-only">
+                <div id="auth-zone">
+                    <button class="btn btn-outline" id="authBtn" onclick="handleAuthAction()" title="Войти / Выйти">
+                        <i class="fas fa-user-circle"></i> <span>Войти</span>
+                    </button>
+                </div>
+                <button id="compare-btn" class="btn btn-outline" style="margin-left:10px;" title="Сравнить выбранных мастеров">
+                    <i class="fas fa-balance-scale"></i>
+                </button>
+                <button id="filter-toggle" class="btn btn-outline" style="margin-left:10px;" title="Фильтры">
+                    <i class="fas fa-sliders-h"></i>
+                </button>
+                <button id="theme-toggle" class="btn btn-outline" style="margin-left:10px;" title="Переключить тему">
+                    <i class="fas fa-moon"></i>
                 </button>
             </div>
-            <!-- Кнопка сравнения -->
-            <button id="compare-btn" class="btn btn-outline" style="margin-left:10px;" title="Сравнить выбранных мастеров">
-                <i class="fas fa-balance-scale"></i>
-            </button>
-            <!-- Кнопка фильтра (только для мобильных) -->
-            <button id="filter-toggle" class="btn btn-outline" style="margin-left:10px;" title="Фильтры">
-                <i class="fas fa-sliders-h"></i>
-            </button>
-            <!-- Кнопка переключения темы -->
-            <button id="theme-toggle" class="btn btn-outline" style="margin-left:10px;" title="Переключить тему">
-                <i class="fas fa-moon"></i>
-            </button>
-            <!-- Гамбургер-меню -->
+            <!-- Кнопка гамбургер (видна на всех, но на десктопе её можно оставить как доп. меню) -->
             <button id="menu-toggle" class="btn btn-outline" style="margin-left:10px;" title="Меню">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
     </header>
 
-    <!-- Выпадающее меню гамбургера (дополнительные функции) -->
+    <!-- Выпадающее гамбургер-меню (со всеми пунктами) -->
     <div id="hamburger-menu" class="hamburger-menu hidden">
         <ul>
-            <li onclick="openCompareFromMenu()"><i class="fas fa-balance-scale"></i> Сравнить выбранных</li>
-            <li onclick="clearAllFavorites()"><i class="fas fa-heart-broken"></i> Очистить избранное</li>
-            <li onclick="showStatistics()"><i class="fas fa-chart-bar"></i> Статистика</li>
-            <li onclick="randomMaster()"><i class="fas fa-random"></i> Случайный мастер</li>
-            <li onclick="showAbout()"><i class="fas fa-info-circle"></i> О проекте</li>
+            <li onclick="showView('orders'); toggleHamburgerMenu()"><i class="fas fa-shopping-bag"></i> Мои заказы</li>
+            <li onclick="compareMasters(); toggleHamburgerMenu()"><i class="fas fa-balance-scale"></i> Сравнить</li>
+            <li onclick="handleAuthAction(); toggleHamburgerMenu()"><i class="fas fa-sign-in-alt"></i> <span id="menu-auth-text">Войти</span></li>
+            <li onclick="toggleTheme(); toggleHamburgerMenu()"><i class="fas fa-moon"></i> <span id="menu-theme-text">Тёмная тема</span></li>
+            <li onclick="document.querySelector('.sidebar').classList.toggle('open'); toggleHamburgerMenu()"><i class="fas fa-sliders-h"></i> Фильтры</li>
+            <li onclick="clearAllFavorites(); toggleHamburgerMenu()"><i class="fas fa-heart-broken"></i> Очистить избранное</li>
+            <li onclick="showStatistics(); toggleHamburgerMenu()"><i class="fas fa-chart-bar"></i> Статистика</li>
+            <li onclick="randomMaster(); toggleHamburgerMenu()"><i class="fas fa-random"></i> Случайный мастер</li>
+            <li onclick="showAbout(); toggleHamburgerMenu()"><i class="fas fa-info-circle"></i> О проекте</li>
         </ul>
     </div>
 
@@ -143,7 +148,7 @@
         </main>
     </div>
 
-    <!-- Модальные окна (все сохранены) -->
+    <!-- Модальные окна (без изменений, оставляем как есть) -->
     <div class="modal-bg" id="modal-auth">
         <div class="modal-box">
             <h2>С возвращением!</h2>
@@ -194,7 +199,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно сравнения -->
     <div id="compare-modal" class="modal-bg" style="display:none;">
         <div class="modal-box" style="width:800px; max-width:95%;">
             <h2>Сравнение мастеров</h2>

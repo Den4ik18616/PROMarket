@@ -1,4 +1,4 @@
-// client.js – финальная версия с мобильной адаптацией
+// client.js – финальная версия с доработанным мобильным меню
 
 // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
 let map, markersLayer;
@@ -170,8 +170,10 @@ function handleAuthAction() {
     } else {
         openModal('modal-auth');
     }
+    updateMenuAuthText();
 }
 
+// ==================== ВХОД / РЕГИСТРАЦИЯ ====================
 async function doLogin() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-pass').value;
@@ -718,6 +720,37 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// Обновление текста в меню в зависимости от состояния
+function updateMenuAuthText() {
+    const authItem = document.querySelector('#menu-auth-text');
+    if (authItem) {
+        authItem.innerText = token ? 'Выйти' : 'Войти';
+    }
+}
+updateMenuAuthText();
+
+// Тёмная тема (переключение)
+function toggleTheme() {
+    const isDark = document.body.hasAttribute('data-theme');
+    if (isDark) {
+        document.body.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        document.getElementById('theme-toggle').innerHTML = '<i class="fas fa-moon"></i>';
+        document.getElementById('menu-theme-text').innerText = 'Тёмная тема';
+    } else {
+        document.body.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        document.getElementById('theme-toggle').innerHTML = '<i class="fas fa-sun"></i>';
+        document.getElementById('menu-theme-text').innerText = 'Светлая тема';
+    }
+}
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') {
+    document.body.setAttribute('data-theme', 'dark');
+    document.getElementById('theme-toggle').innerHTML = '<i class="fas fa-sun"></i>';
+    document.getElementById('menu-theme-text').innerText = 'Светлая тема';
+}
+
 // ==================== ФУНКЦИИ МЕНЮ ====================
 function openCompareFromMenu() {
     compareMasters();
@@ -828,25 +861,8 @@ function closeCompareModal() {
     document.getElementById('compare-modal').style.display = 'none';
 }
 
-// ==================== ТЁМНАЯ ТЕМА ====================
-const themeToggle = document.getElementById('theme-toggle');
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme === 'dark') {
-    document.body.setAttribute('data-theme', 'dark');
-    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-}
-themeToggle.onclick = () => {
-    const isDark = document.body.hasAttribute('data-theme');
-    if (isDark) {
-        document.body.removeAttribute('data-theme');
-        localStorage.setItem('theme', 'light');
-        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-    } else {
-        document.body.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
-        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-    }
-};
+// ==================== ТЁМНАЯ ТЕМА (кнопка в шапке) ====================
+document.getElementById('theme-toggle').onclick = toggleTheme;
 
 // ==================== КНОПКА "НАВЕРХ" ====================
 window.addEventListener('scroll', () => {

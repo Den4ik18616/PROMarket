@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>PROMarket — Premium Service</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Leaflet CSS и JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
     <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-    <!-- Particles.js, GSAP, Chart.js (Chart.js пока не используется, но оставим) -->
+    <!-- Particles.js, GSAP, Chart.js -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -49,15 +49,14 @@
             <button id="theme-toggle" class="btn btn-outline" style="margin-left:10px;" title="Переключить тему">
                 <i class="fas fa-moon"></i>
             </button>
-            <!-- Гамбургер-меню -->
+            <!-- Кнопка гамбургер-меню (для дополнительных функций) -->
             <button id="menu-toggle" class="btn btn-outline" style="margin-left:10px;" title="Меню">
                 <i class="fas fa-bars"></i>
             </button>
-            <!-- Квадратик выбора цвета удалён -->
         </div>
     </header>
 
-    <!-- Выпадающее меню гамбургера -->
+    <!-- Выпадающее меню гамбургера (дополнительные функции) -->
     <div id="hamburger-menu" class="hamburger-menu hidden">
         <ul>
             <li onclick="openCompareFromMenu()"><i class="fas fa-balance-scale"></i> Сравнить выбранных</li>
@@ -137,7 +136,7 @@
         </main>
     </div>
 
-    <!-- Модальные окна -->
+    <!-- Модальные окна (все сохранены) -->
     <div class="modal-bg" id="modal-auth">
         <div class="modal-box">
             <h2>С возвращением!</h2>

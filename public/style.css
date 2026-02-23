@@ -1,3 +1,4 @@
+/* public/style.css */
 :root {
     --primary: #4f46e5; --primary-hover: #4338ca;
     --bg: #f8fafc; --card: #ffffff;
@@ -5,7 +6,6 @@
     --success: #10b981; --danger: #ef4444;
 }
 
-/* Тёмная тема */
 [data-theme="dark"] {
     --bg: #1e293b;
     --card: #334155;
@@ -25,7 +25,6 @@ body, html {
     overflow:hidden;
 }
 
-/* Фон с частицами */
 #particles-js {
     position: fixed;
     top: 0;
@@ -36,7 +35,6 @@ body, html {
     pointer-events: none;
 }
 
-/* Прогресс-бар */
 #progress-bar {
     position: fixed;
     top: 0;
@@ -48,7 +46,6 @@ body, html {
     z-index: 10001;
 }
 
-/* Кнопка наверх */
 #scrollTop {
     position: fixed;
     bottom: 20px;
@@ -62,7 +59,6 @@ body, html {
 }
 #scrollTop:hover { opacity: 1; }
 
-/* Шапка */
 header {
     height: 72px;
     background: rgba(255,255,255,0.8);
@@ -123,7 +119,11 @@ header {
     color: #f1f5f9;
 }
 
-/* Уведомления */
+.desktop-only {
+    display: flex;
+    align-items: center;
+}
+
 .notification-badge {
     position: relative;
     margin-right: 5px;
@@ -149,14 +149,12 @@ header {
 }
 .notification-badge i { transition: transform 0.2s; }
 
-/* Основной контейнер */
 .app-container {
     display: flex;
     height: calc(100vh - 72px);
     margin-top: 72px;
 }
 
-/* Сайдбар */
 .sidebar {
     width: 380px;
     background: #fff;
@@ -170,7 +168,6 @@ header {
     border-right-color: #334155;
 }
 
-/* Стилизованная карта (спутник) */
 .styled-map {
     height: 280px;
     width: 100%;
@@ -183,7 +180,6 @@ header {
     filter: drop-shadow(0 8px 16px rgba(0,0,0,0.15));
 }
 
-/* Кастомные маркеры */
 .custom-marker {
     background-color: var(--primary);
     width: 16px;
@@ -193,7 +189,6 @@ header {
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-/* Табы */
 .tabs-nav {
     display: flex;
     padding: 10px;
@@ -223,7 +218,6 @@ header {
     background: #334155;
 }
 
-/* Фильтры */
 .filter-content {
     padding: 25px;
     overflow-y: auto;
@@ -255,7 +249,6 @@ select, input[type="number"], input[type="text"] {
     color: #f1f5f9;
 }
 
-/* Основной контент */
 .main {
     flex-grow: 1;
     padding: 40px;
@@ -268,7 +261,6 @@ select, input[type="number"], input[type="text"] {
     gap: 30px;
 }
 
-/* Карточка мастера и заказа */
 .card {
     background: var(--card);
     padding: 24px;
@@ -376,7 +368,6 @@ select, input[type="number"], input[type="text"] {
     margin-left: 5px;
 }
 
-/* Тосты */
 .toast {
     position: fixed;
     bottom: 30px;
@@ -397,7 +388,6 @@ select, input[type="number"], input[type="text"] {
 .toast.error { background: #ef4444; }
 .toast.info { background: #1e293b; }
 
-/* Модальные окна */
 .modal-bg {
     position: fixed;
     top: 0;
@@ -447,7 +437,6 @@ select, input[type="number"], input[type="text"] {
     color:#f1f5f9;
 }
 
-/* Гамбургер-меню */
 .hamburger-menu {
     position: absolute;
     top: 72px;
@@ -478,7 +467,6 @@ select, input[type="number"], input[type="text"] {
 .hamburger-menu li:hover { background: #f1f5f9; }
 [data-theme="dark"] .hamburger-menu li:hover { background: #1e293b; }
 
-/* Чекбокс сравнения */
 .compare-checkbox {
     margin-right: 10px;
     width: 18px;
@@ -486,7 +474,6 @@ select, input[type="number"], input[type="text"] {
     cursor: pointer;
 }
 
-/* Компас (центрирование карты) */
 .compass-icon {
     cursor: pointer;
     color: var(--text-muted);
@@ -494,7 +481,6 @@ select, input[type="number"], input[type="text"] {
 }
 .compass-icon:hover { color: var(--primary); }
 
-/* Таблица сравнения */
 .compare-table {
     width: 100%;
     border-collapse: collapse;
@@ -514,7 +500,6 @@ select, input[type="number"], input[type="text"] {
 .compare-table td { background: var(--card); }
 [data-theme="dark"] .compare-table td { background: #334155; }
 
-/* Статистика */
 .stat-item {
     display: flex;
     justify-content: space-between;
@@ -524,7 +509,6 @@ select, input[type="number"], input[type="text"] {
 .stat-label { font-weight: 700; color: var(--text-muted); }
 .stat-value { font-weight: 700; color: var(--primary); }
 
-/* Лоадеры */
 .loader {
     text-align: center;
     padding: 40px;
@@ -532,7 +516,6 @@ select, input[type="number"], input[type="text"] {
 }
 .loader.hidden { display: none; }
 
-/* Маскот */
 .mascot {
     text-align: center;
     padding: 20px;
@@ -540,7 +523,6 @@ select, input[type="number"], input[type="text"] {
     color: var(--text-muted);
 }
 
-/* ========== АДАПТИВНОСТЬ ========== */
 @media (max-width: 768px) {
     header {
         padding: 0 10px;
@@ -557,7 +539,6 @@ select, input[type="number"], input[type="text"] {
     .search-bar input {
         font-size: 0.8rem;
     }
-    /* Скрываем десктопные кнопки */
     .desktop-only {
         display: none;
     }
@@ -569,7 +550,6 @@ select, input[type="number"], input[type="text"] {
     .notification-badge {
         margin-right: 0;
     }
-    /* Сайдбар скрыт по умолчанию */
     .sidebar {
         position: fixed;
         top: 72px;
@@ -602,7 +582,6 @@ select, input[type="number"], input[type="text"] {
         grid-template-columns: 1fr;
         gap: 15px;
     }
-    /* Уменьшаем карточки */
     .card {
         padding: 15px;
     }

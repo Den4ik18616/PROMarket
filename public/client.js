@@ -1,4 +1,4 @@
-// client.js – финальная версия с доработанным мобильным меню
+// public/client.js – полная версия с мобильным меню и исправлениями
 
 // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
 let map, markersLayer;
@@ -173,7 +173,6 @@ function handleAuthAction() {
     updateMenuAuthText();
 }
 
-// ==================== ВХОД / РЕГИСТРАЦИЯ ====================
 async function doLogin() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-pass').value;
@@ -720,7 +719,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Обновление текста в меню в зависимости от состояния
 function updateMenuAuthText() {
     const authItem = document.querySelector('#menu-auth-text');
     if (authItem) {
@@ -729,7 +727,6 @@ function updateMenuAuthText() {
 }
 updateMenuAuthText();
 
-// Тёмная тема (переключение)
 function toggleTheme() {
     const isDark = document.body.hasAttribute('data-theme');
     if (isDark) {
@@ -885,6 +882,11 @@ document.addEventListener('click', (e) => {
         sidebar.classList.remove('open');
     }
 });
+
+// Функция для открытия/закрытия сайдбара (используется в гамбургер-меню)
+function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('open');
+}
 
 // ==================== ИНИЦИАЛИЗАЦИЯ ====================
 if (token) {

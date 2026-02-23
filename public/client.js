@@ -318,7 +318,7 @@ async function getPros() {
                 distanceHtml +
                 '<div class="price">' + p.price + ' <span>₽/час</span></div>' +
                 '<button class="btn btn-primary" onclick="openBooking(\'' + p.id + '\', \'' + safeName + '\', ' + p.price + ')">Заказать услугу</button>' +
-                '<button class="btn btn-outline" style="margin-top:10px" onclick="showToast(\'Чат с мастером в разработке\', \'info\')" title="Пока в разработке">Чат с мастером</button>';
+                '<button class="btn btn-outline chat-btn" style="margin-top:10px" onclick="showToast(\'Чат с мастером в разработке\', \'info\')" title="Пока в разработке">Чат с мастером</button>';
 
             card.innerHTML = html;
             list.appendChild(card);
@@ -868,6 +868,7 @@ function showAbout() {
 
 // ==================== СРАВНЕНИЕ МАСТЕРОВ ====================
 function compareMasters() {
+    console.log('compareMasters called');
     const isMobile = document.documentElement.classList.contains('mobile');
     let selectedMasters = [];
 
@@ -877,10 +878,12 @@ function compareMasters() {
     } else {
         // На ПК используем чекбоксы
         const checkboxes = document.querySelectorAll('.compare-checkbox:checked');
+        console.log('checkboxes found:', checkboxes.length);
         const selectedIds = Array.from(checkboxes).map(cb => cb.dataset.id);
         selectedMasters = pros.filter(p => selectedIds.includes(p.id));
     }
 
+    console.log('selectedMasters:', selectedMasters);
     if (selectedMasters.length < 2) {
         showToast('Выберите хотя бы двух мастеров для сравнения', 'error');
         return;

@@ -33,11 +33,11 @@
     <header>
         <div class="logo" onclick="showView('pros')" style="cursor: pointer;"><i class="fas fa-bolt"></i> PROMarket</div>
         <div class="search-bar">
-            <i class="fas fa-search" style="color:#94a3b8"></i>
+            <i class="fas fa-search"></i>
             <input type="text" id="main-search" placeholder="Поиск мастеров..." autofocus oninput="debounce(getPros, 500)()">
         </div>
         <div style="display: flex; align-items: center;">
-            <!-- Уведомления (видно только на ПК) -->
+            <!-- Колокольчик (скрыт на мобильных) -->
             <div class="notification-badge" id="notificationBell" onclick="showNotifications()" title="Уведомления">
                 <i class="fas fa-bell fa-lg"></i>
                 <span class="badge hidden" id="notificationCount">0</span>
@@ -48,6 +48,7 @@
                         <i class="fas fa-user-circle"></i> <span>Войти</span>
                     </button>
                 </div>
+                <!-- Кнопка сравнения (видна на ПК) -->
                 <button id="compare-btn" class="btn btn-outline" style="margin-left:10px;" title="Сравнить выбранных мастеров">
                     <i class="fas fa-balance-scale"></i>
                 </button>
@@ -95,7 +96,7 @@
                 <button class="tab-btn" id="t-orders" onclick="showView('orders')">Мои заказы</button>
             </div>
             <div class="filter-content">
-                <!-- фильтры -->
+                <!-- фильтры (без изменений) -->
                 <div class="filter-group">
                     <label>Категория услуг</label>
                     <select id="f-cat" onchange="getPros()">

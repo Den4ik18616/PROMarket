@@ -1,4 +1,5 @@
-// client.js – финальная версия с улучшениями для мобильных
+// client.js – финальная версия с поддержкой мобильных устройств, аватарками,
+// иконками сравнения, бейджами уведомлений на кнопке гамбургера и всеми функциями
 
 // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
 let map, markersLayer;
@@ -11,7 +12,7 @@ let ws = null;
 let pros = [];
 let userLocation = null;
 let currentRatingComplete = 0;
-let selectedForCompare = JSON.parse(localStorage.getItem('compare') || '[]'); // массив для сравнения на мобильных
+let selectedForCompare = JSON.parse(localStorage.getItem('compare') || '[]');
 
 const cancelReasons = [
     'Передумал',
@@ -157,10 +158,10 @@ function toggleCompare(id, el) {
     const index = selectedForCompare.indexOf(id);
     if (index === -1) {
         selectedForCompare.push(id);
-        el.classList.add('active');
+        if (el) el.classList.add('active');
     } else {
         selectedForCompare.splice(index, 1);
-        el.classList.remove('active');
+        if (el) el.classList.remove('active');
     }
     localStorage.setItem('compare', JSON.stringify(selectedForCompare));
 }
@@ -296,7 +297,7 @@ async function getPros() {
             card.className = 'card';
             card.style.animationDelay = idx * 0.05 + 's';
 
-            // Аватарка
+            // Аватарка (первая буква имени)
             const avatar = '<div class="avatar">' + p.name.charAt(0) + '</div>';
 
             let html = '<div class="card-header">' +

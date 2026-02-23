@@ -476,7 +476,6 @@ select, input[type="number"], input[type="text"] {
     font-size: 0.7rem;
 }
 
-/* Стили для бейджа на кнопке гамбургер */
 #menu-toggle {
     position: relative;
 }
@@ -487,14 +486,12 @@ select, input[type="number"], input[type="text"] {
     transform: translate(30%, -30%);
 }
 
-/* Чекбокс сравнения */
 .compare-checkbox {
     margin-right: 10px;
     width: 18px;
     height: 18px;
     cursor: pointer;
 }
-/* Иконка сравнения (скрыта на ПК, видна на мобильных) */
 .compare-icon {
     cursor: pointer;
     color: var(--text-muted);
@@ -554,7 +551,6 @@ select, input[type="number"], input[type="text"] {
     color: var(--text-muted);
 }
 
-/* Аватарка */
 .avatar {
     width: 40px;
     height: 40px;
@@ -596,7 +592,7 @@ select, input[type="number"], input[type="text"] {
         font-size: 0.9rem;
     }
     .notification-badge {
-        display: none; /* скрываем колокольчик в шапке */
+        display: none;
     }
     #menu-toggle {
         background: var(--primary);
@@ -706,7 +702,6 @@ select, input[type="number"], input[type="text"] {
         min-height: 36px;
         min-width: 36px;
     }
-    /* На мобильных скрываем чекбокс, показываем иконку сравнения */
     .compare-checkbox {
         display: none;
     }
@@ -748,13 +743,13 @@ select, input[type="number"], input[type="text"] {
     font-size: 1.2rem;
 }
 .mobile .search-bar {
-    background: transparent; /* убираем серый фон */
-    border: none; /* убираем обводку */
+    background: transparent;
+    border: none;
     width: auto;
     flex: 1;
     margin: 0 5px;
     max-width: 140px;
-    padding: 0; /* убираем внутренние отступы */
+    padding: 0;
 }
 .mobile .search-bar input {
     font-size: 0.8rem;
@@ -777,7 +772,7 @@ select, input[type="number"], input[type="text"] {
     font-size: 0.9rem;
 }
 .mobile .notification-badge {
-    display: none; /* скрываем колокольчик в шапке */
+    display: none;
 }
 .mobile #menu-toggle {
     background: var(--primary);
@@ -925,7 +920,6 @@ select, input[type="number"], input[type="text"] {
     width: 0%;
     transition: width 0.1s;
 }
-/* Стили для пункта уведомлений в меню */
 .mobile .hamburger-menu li .badge {
     position: static;
     margin-left: auto;

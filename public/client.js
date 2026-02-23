@@ -1,4 +1,4 @@
-// client.js – финальная версия с исправлениями
+// client.js – финальная версия с исправлением фильтров на мобильных
 
 // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
 let map, markersLayer;
@@ -11,7 +11,6 @@ let ws = null;
 let pros = [];
 let userLocation = null;
 let currentRatingComplete = 0;
-let selectedForCompare = JSON.parse(localStorage.getItem('compare') || '[]');
 
 const cancelReasons = [
     'Передумал',
@@ -46,7 +45,7 @@ particlesJS('particles-js', {
     }
 });
 
-// ==================== LEAFLET КАРТА ====================
+// ==================== LEAFLET КАРТА (спутник) ====================
 function initMap() {
     map = L.map('map').setView([55.75, 37.61], 10);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -150,19 +149,6 @@ function toggleFav(id, el) {
         el.classList.add('animate');
         setTimeout(() => el.classList.remove('animate'), 300);
     }
-}
-
-// ==================== СРАВНЕНИЕ (ДЛЯ МОБИЛЬНЫХ) ====================
-function toggleCompare(id, el) {
-    const index = selectedForCompare.indexOf(id);
-    if (index === -1) {
-        selectedForCompare.push(id);
-        if (el) el.classList.add('active');
-    } else {
-        selectedForCompare.splice(index, 1);
-        if (el) el.classList.remove('active');
-    }
-    localStorage.setItem('compare', JSON.stringify(selectedForCompare));
 }
 
 // ==================== МОДАЛЬНЫЕ ОКНА ====================
@@ -282,33 +268,25 @@ async function getPros() {
         pros.forEach((p, idx) => {
             const isFav = favorites.includes(p.id);
             const verifiedBadge = p.verified ? '<i class="fas fa-check-circle verified-badge" title="Проверенный мастер"></i>' : '';
-            const isSelected = selectedForCompare.includes(p.id);
 
             let distanceHtml = '';
             if (userLocation) {
                 const from = L.latLng(userLocation.lat, userLocation.lng);
                 const to = L.latLng(p.location.lat, p.location.lng);
                 const distKm = from.distanceTo(to) / 1000;
-                distanceHtml = '<div class="distanceHtml" style="font-size:0.8rem; color:var(--text-muted); margin-top:5px">🚗 ' + distKm.toFixed(1) + ' км</div>';
+                distanceHtml = '<div style="font-size:0.8rem; color:var(--text-muted); margin-top:5px">🚗 ' + distKm.toFixed(1) + ' км</div>';
             }
 
             const card = document.createElement('div');
             card.className = 'card';
             card.style.animationDelay = idx * 0.05 + 's';
 
-            // Аватарка (первая буква имени)
-            const avatar = '<div class="avatar">' + p.name.charAt(0) + '</div>';
-
-            // Экранируем имя для onclick (заменяем апострофы)
-            const safeName = p.name.replace(/'/g, "\\'");
-
             let html = '<div class="card-header">' +
-                avatar +
+                '<input type="checkbox" class="compare-checkbox" data-id="' + p.id + '" title="Выбрать для сравнения">' +
                 '<span class="category-tag"><i class="fas ' + p.icon + '"></i> ' + p.category + '</span>' +
-                '<div style="display:flex; gap:5px;">' +
-                '<input type="checkbox" class="compare-checkbox" data-id="' + p.id + '" ' + (isSelected ? 'checked' : '') + ' onchange="toggleCompare(\'' + p.id + '\', this)" title="Выбрать для сравнения">' +
+                '<div style="display:flex; gap:10px;">' +
                 '<i class="fa' + (isFav ? 's' : 'r') + ' fa-heart fav-btn ' + (isFav ? 'active' : '') + '" onclick="toggleFav(\'' + p.id + '\', this)" title="' + (isFav ? 'Убрать из избранного' : 'Добавить в избранное') + '"></i>' +
-                '<i class="fas fa-share-alt" onclick="sharePro(\'' + p.id + '\', \'' + safeName + '\')" style="cursor:pointer; color:var(--text-muted);" title="Поделиться"></i>' +
+                '<i class="fas fa-share-alt" onclick="sharePro(\'' + p.id + '\', \'' + p.name + '\')" style="cursor:pointer; color:var(--text-muted);" title="Поделиться"></i>' +
                 '<i class="fas fa-compass compass-icon" onclick="centerMap(' + p.location.lat + ', ' + p.location.lng + ')" title="Показать на карте"></i>' +
                 '</div>' +
                 '</div>' +
@@ -317,8 +295,8 @@ async function getPros() {
                 '<p style="font-size:0.85rem; color:var(--text-muted); margin:15px 0">' + p.desc + '</p>' +
                 distanceHtml +
                 '<div class="price">' + p.price + ' <span>₽/час</span></div>' +
-                '<button class="btn btn-primary" onclick="openBooking(\'' + p.id + '\', \'' + safeName + '\', ' + p.price + ')">Заказать услугу</button>' +
-                '<button class="btn btn-outline chat-btn" style="margin-top:10px" onclick="showToast(\'Чат с мастером в разработке\', \'info\')" title="Пока в разработке">Чат с мастером</button>';
+                '<button class="btn btn-primary" onclick="openBooking(\'' + p.id + '\', \'' + p.name + '\', ' + p.price + ')">Заказать услугу</button>' +
+                '<button class="btn btn-outline" style="margin-top:10px" onclick="showToast(\'Чат с мастером в разработке\', \'info\')" title="Пока в разработке">Чат с мастером</button>';
 
             card.innerHTML = html;
             list.appendChild(card);
@@ -502,47 +480,17 @@ async function fetchNotifications() {
         if (!res.ok) throw new Error('Ошибка загрузки');
         const notifs = await res.json();
         const count = notifs.length;
-        
-        // Обновляем бейдж колокольчика (на ПК)
-        const bellBadge = document.getElementById('notificationCount');
-        if (bellBadge) {
-            if (count > 0) {
-                bellBadge.classList.remove('hidden');
-                bellBadge.innerText = count;
-            } else {
-                bellBadge.classList.add('hidden');
-            }
-        }
-
-        // Обновляем бейдж на кнопке гамбургер
-        const hamburgerBadge = document.getElementById('hamburger-notif-count');
-        if (hamburgerBadge) {
-            if (count > 0) {
-                hamburgerBadge.classList.remove('hidden');
-                hamburgerBadge.innerText = count;
-            } else {
-                hamburgerBadge.classList.add('hidden');
-            }
-        }
-
-        // Обновляем бейдж в меню
-        const menuBadge = document.getElementById('menu-notif-count');
-        if (menuBadge) {
-            if (count > 0) {
-                menuBadge.classList.remove('hidden');
-                menuBadge.innerText = count;
-            } else {
-                menuBadge.classList.add('hidden');
-            }
-        }
-
-        // Анимация колокольчика при новых уведомлениях (только если колокольчик виден)
-        if (count > lastNotifCount) {
-            const bell = document.getElementById('notificationBell')?.querySelector('i');
-            if (bell) {
+        const badge = document.getElementById('notificationCount');
+        if (count > 0) {
+            badge.classList.remove('hidden');
+            badge.innerText = count;
+            if (count > lastNotifCount) {
+                const bell = document.getElementById('notificationBell').querySelector('i');
                 bell.style.animation = 'bell-shake 0.5s';
                 setTimeout(() => bell.style.animation = '', 500);
             }
+        } else {
+            badge.classList.add('hidden');
         }
         lastNotifCount = count;
         return notifs;
@@ -765,6 +713,7 @@ function toggleHamburgerMenu() {
 }
 document.getElementById('menu-toggle').onclick = toggleHamburgerMenu;
 
+// Закрытие меню при клике вне его
 document.addEventListener('click', (e) => {
     const menu = document.getElementById('hamburger-menu');
     const btn = document.getElementById('menu-toggle');
@@ -773,6 +722,7 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// Обновление текста в меню в зависимости от состояния
 function updateMenuAuthText() {
     const authItem = document.querySelector('#menu-auth-text');
     if (authItem) {
@@ -781,6 +731,7 @@ function updateMenuAuthText() {
 }
 updateMenuAuthText();
 
+// Тёмная тема (переключение)
 function toggleTheme() {
     const isDark = document.body.hasAttribute('data-theme');
     if (isDark) {
@@ -867,27 +818,16 @@ function showAbout() {
 }
 
 // ==================== СРАВНЕНИЕ МАСТЕРОВ ====================
+document.getElementById('compare-btn').onclick = compareMasters;
+
 function compareMasters() {
-    console.log('compareMasters called');
-    const isMobile = document.documentElement.classList.contains('mobile');
-    let selectedMasters = [];
-
-    if (isMobile) {
-        // На мобильных используем массив selectedForCompare
-        selectedMasters = pros.filter(p => selectedForCompare.includes(p.id));
-    } else {
-        // На ПК используем чекбоксы
-        const checkboxes = document.querySelectorAll('.compare-checkbox:checked');
-        console.log('checkboxes found:', checkboxes.length);
-        const selectedIds = Array.from(checkboxes).map(cb => cb.dataset.id);
-        selectedMasters = pros.filter(p => selectedIds.includes(p.id));
-    }
-
-    console.log('selectedMasters:', selectedMasters);
-    if (selectedMasters.length < 2) {
+    const checkboxes = document.querySelectorAll('.compare-checkbox:checked');
+    const selectedIds = Array.from(checkboxes).map(cb => cb.dataset.id);
+    if (selectedIds.length < 2) {
         showToast('Выберите хотя бы двух мастеров для сравнения', 'error');
         return;
     }
+    const selectedMasters = pros.filter(p => selectedIds.includes(p.id));
     showCompareModal(selectedMasters);
 }
 
@@ -933,19 +873,23 @@ window.addEventListener('scroll', () => {
 });
 document.getElementById('scrollTop').onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-// ==================== УПРАВЛЕНИЕ САЙДБАРОМ ====================
+// ==================== УПРАВЛЕНИЕ САЙДБАРОМ НА МОБИЛЬНЫХ ====================
+// Функция для открытия/закрытия сайдбара (используется в гамбургер-меню)
 function toggleSidebar() {
     document.querySelector('.sidebar').classList.toggle('open');
 }
+
 document.getElementById('filter-toggle').onclick = toggleSidebar;
 document.getElementById('sidebar-close').onclick = () => {
     document.querySelector('.sidebar').classList.remove('open');
 };
 
+// Закрытие сайдбара при клике вне его (но не внутри гамбургер-меню)
 document.addEventListener('click', (e) => {
     const sidebar = document.querySelector('.sidebar');
     const filterBtn = document.getElementById('filter-toggle');
     const hamburgerMenu = document.getElementById('hamburger-menu');
+    // Если клик был внутри гамбургер-меню, не закрываем сайдбар
     if (hamburgerMenu && hamburgerMenu.contains(e.target)) {
         return;
     }
@@ -953,31 +897,6 @@ document.addEventListener('click', (e) => {
         sidebar.classList.remove('open');
     }
 });
-
-// ==================== СВАЙП ДЛЯ ЗАКРЫТИЯ САЙДБАРА ====================
-let touchstartX = 0;
-let touchendX = 0;
-const sidebarEl = document.querySelector('.sidebar');
-if (sidebarEl) {
-    sidebarEl.addEventListener('touchstart', e => {
-        touchstartX = e.changedTouches[0].screenX;
-    });
-    sidebarEl.addEventListener('touchend', e => {
-        touchendX = e.changedTouches[0].screenX;
-        if (touchendX < touchstartX - 50) {
-            sidebarEl.classList.remove('open');
-        }
-    });
-}
-
-// ==================== ИНДИКАТОР ПРОКРУТКИ ====================
-const prosList = document.getElementById('pros-list');
-if (prosList) {
-    prosList.addEventListener('scroll', () => {
-        const scrollPercent = (prosList.scrollTop / (prosList.scrollHeight - prosList.clientHeight)) * 100;
-        document.getElementById('scroll-indicator').style.width = scrollPercent + '%';
-    });
-}
 
 // ==================== ИНИЦИАЛИЗАЦИЯ ====================
 if (token) {

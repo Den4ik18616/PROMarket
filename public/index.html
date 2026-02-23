@@ -33,11 +33,10 @@
     <header>
         <div class="logo" onclick="showView('pros')" style="cursor: pointer;"><i class="fas fa-bolt"></i> PROMarket</div>
         <div class="search-bar">
-            <i class="fas fa-search"></i>
+            <i class="fas fa-search" style="color:#94a3b8"></i>
             <input type="text" id="main-search" placeholder="Поиск мастеров..." autofocus oninput="debounce(getPros, 500)()">
         </div>
         <div style="display: flex; align-items: center;">
-            <!-- Колокольчик (скрыт на мобильных) -->
             <div class="notification-badge" id="notificationBell" onclick="showNotifications()" title="Уведомления">
                 <i class="fas fa-bell fa-lg"></i>
                 <span class="badge hidden" id="notificationCount">0</span>
@@ -48,7 +47,6 @@
                         <i class="fas fa-user-circle"></i> <span>Войти</span>
                     </button>
                 </div>
-                <!-- Кнопка сравнения (видна на ПК) -->
                 <button id="compare-btn" class="btn btn-outline" style="margin-left:10px;" title="Сравнить выбранных мастеров">
                     <i class="fas fa-balance-scale"></i>
                 </button>
@@ -59,10 +57,8 @@
                     <i class="fas fa-moon"></i>
                 </button>
             </div>
-            <!-- Кнопка гамбургер с бейджем уведомлений -->
             <button id="menu-toggle" class="btn btn-outline" style="margin-left:10px;" title="Меню">
                 <i class="fas fa-bars"></i>
-                <span id="hamburger-notif-count" class="badge hidden">0</span>
             </button>
         </div>
     </header>
@@ -74,10 +70,6 @@
             <li onclick="handleAuthAction(); toggleHamburgerMenu()"><i class="fas fa-sign-in-alt"></i> <span id="menu-auth-text">Войти</span></li>
             <li onclick="toggleTheme(); toggleHamburgerMenu()"><i class="fas fa-moon"></i> <span id="menu-theme-text">Тёмная тема</span></li>
             <li onclick="toggleSidebar(); toggleHamburgerMenu()"><i class="fas fa-sliders-h"></i> Фильтры</li>
-            <li onclick="showNotifications(); toggleHamburgerMenu()">
-                <i class="fas fa-bell"></i> Уведомления
-                <span id="menu-notif-count" class="badge hidden">0</span>
-            </li>
             <li onclick="clearAllFavorites(); toggleHamburgerMenu()"><i class="fas fa-heart-broken"></i> Очистить избранное</li>
             <li onclick="showStatistics(); toggleHamburgerMenu()"><i class="fas fa-chart-bar"></i> Статистика</li>
             <li onclick="randomMaster(); toggleHamburgerMenu()"><i class="fas fa-random"></i> Случайный мастер</li>

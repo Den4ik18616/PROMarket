@@ -635,7 +635,7 @@ select, input[type="number"], input[type="text"] {
     }
     .main {
         margin-left: 0;
-        padding: 10px;
+        padding: 8px;
         width: 100%;
     }
     .styled-map {
@@ -644,68 +644,71 @@ select, input[type="number"], input[type="text"] {
     }
     .grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+        gap: 5px;
     }
     .card {
-        padding: 6px;
+        padding: 4px;
         box-shadow: none;
         border: 1px solid rgba(0,0,0,0.05);
+        min-height: 180px; /* делаем карточки более квадратными */
     }
     .card h3 {
-        font-size: 0.9rem;
-        margin: 3px 0;
+        font-size: 0.8rem;
+        margin: 2px 0;
     }
     .category-tag {
-        font-size: 0.55rem;
+        font-size: 0.5rem;
         padding: 2px 4px;
     }
     .price {
-        font-size: 1rem;
-        margin: 3px 0;
+        font-size: 0.9rem;
+        margin: 2px 0;
     }
     .price span {
-        font-size: 0.7rem;
+        font-size: 0.6rem;
     }
     .card p {
         display: none;
     }
     .btn-primary {
-        padding: 6px;
-        font-size: 0.7rem;
-        min-height: 32px;
+        padding: 4px;
+        font-size: 0.6rem;
+        min-height: 28px;
     }
     .card-header {
-        margin-bottom: 5px;
+        margin-bottom: 3px;
         align-items: center;
     }
     .fav-btn,
     .compass-icon,
     .fa-share-alt {
-        font-size: 0.9rem;
-        min-height: 36px;
-        min-width: 36px;
+        font-size: 0.8rem;
+        min-height: 30px;
+        min-width: 30px;
     }
     .distanceHtml {
-        font-size: 0.65rem;
+        font-size: 0.55rem;
     }
     .btn, .fav-btn, .compare-checkbox, .compass-icon {
-        min-height: 36px;
-        min-width: 36px;
+        min-height: 30px;
+        min-width: 30px;
     }
     .compare-checkbox {
         display: inline-flex;
+        width: 14px;
+        height: 14px;
     }
     .avatar {
-        width: 32px;
-        height: 32px;
-        font-size: 1rem;
-        margin-right: 6px;
+        width: 26px;
+        height: 26px;
+        font-size: 0.8rem;
+        margin-right: 4px;
     }
     #scrollTop {
-        width: 36px;
-        height: 36px;
-        bottom: 10px;
-        right: 10px;
+        width: 30px;
+        height: 30px;
+        bottom: 8px;
+        right: 8px;
         opacity: 0.6;
     }
     #scrollTop:hover {
@@ -834,7 +837,7 @@ select, input[type="number"], input[type="text"] {
     padding: 4px;
     box-shadow: none;
     border: 1px solid rgba(0,0,0,0.05);
-    min-height: 180px; /* делаем карточки более квадратными */
+    min-height: 180px;
 }
 .mobile .card h3 {
     font-size: 0.8rem;

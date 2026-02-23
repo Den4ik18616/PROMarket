@@ -1,4 +1,4 @@
-// client.js – финальная версия со всеми улучшениями и исправлением прозрачности карточек заказов
+// client.js – финальная версия с мобильной адаптацией
 
 // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
 let map, markersLayer;
@@ -48,9 +48,8 @@ particlesJS('particles-js', {
 // ==================== LEAFLET КАРТА (спутник) ====================
 function initMap() {
     map = L.map('map').setView([55.75, 37.61], 10);
-    // Спутниковые тайлы ESRI World Imagery
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        attribution: 'Tiles © Esri',
         maxZoom: 19
     }).addTo(map);
 
@@ -447,7 +446,7 @@ async function getOrders() {
                 statusColor = 'color: var(--primary);';
             }
 
-            const cardHtml = '<div class="card visible">' +   // Добавлен класс visible для устранения прозрачности
+            const cardHtml = '<div class="card visible">' +
                 '<div style="font-size:0.7rem; font-weight:800; margin-bottom:10px; text-transform:uppercase; ' + statusColor + '">' + o.status + '</div>' +
                 '<h3 style="margin:0">' + o.proName + '</h3>' +
                 '<p style="font-size:0.85rem; color:var(--text-muted)">📅 ' + o.date + '</p>' +
@@ -855,6 +854,21 @@ window.addEventListener('scroll', () => {
     if (btn) btn.style.display = window.scrollY > 300 ? 'block' : 'none';
 });
 document.getElementById('scrollTop').onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+// ==================== УПРАВЛЕНИЕ САЙДБАРОМ НА МОБИЛЬНЫХ ====================
+document.getElementById('filter-toggle').onclick = () => {
+    document.querySelector('.sidebar').classList.toggle('open');
+};
+document.getElementById('sidebar-close').onclick = () => {
+    document.querySelector('.sidebar').classList.remove('open');
+};
+document.addEventListener('click', (e) => {
+    const sidebar = document.querySelector('.sidebar');
+    const filterBtn = document.getElementById('filter-toggle');
+    if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && !filterBtn.contains(e.target)) {
+        sidebar.classList.remove('open');
+    }
+});
 
 // ==================== ИНИЦИАЛИЗАЦИЯ ====================
 if (token) {

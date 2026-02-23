@@ -7,7 +7,7 @@
     <!-- Leaflet CSS и JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Кластеризация маркеров (опционально) -->
+    <!-- Кластеризация маркеров -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
     <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
@@ -45,11 +45,15 @@
             <button id="compare-btn" class="btn btn-outline" style="margin-left:10px;" title="Сравнить выбранных мастеров">
                 <i class="fas fa-balance-scale"></i>
             </button>
+            <!-- Кнопка фильтра (только для мобильных) -->
+            <button id="filter-toggle" class="btn btn-outline" style="margin-left:10px;" title="Фильтры">
+                <i class="fas fa-sliders-h"></i>
+            </button>
             <!-- Кнопка переключения темы -->
             <button id="theme-toggle" class="btn btn-outline" style="margin-left:10px;" title="Переключить тему">
                 <i class="fas fa-moon"></i>
             </button>
-            <!-- Кнопка гамбургер-меню (для дополнительных функций) -->
+            <!-- Гамбургер-меню -->
             <button id="menu-toggle" class="btn btn-outline" style="margin-left:10px;" title="Меню">
                 <i class="fas fa-bars"></i>
             </button>
@@ -69,6 +73,9 @@
 
     <div class="app-container">
         <aside class="sidebar">
+            <div style="display: flex; justify-content: flex-end; padding: 10px;">
+                <button id="sidebar-close" class="btn btn-outline" style="padding: 8px 12px;">✕</button>
+            </div>
             <div id="map" class="styled-map"></div>
             <div class="tabs-nav">
                 <button class="tab-btn active" id="t-pros" onclick="showView('pros')" title="Список специалистов">Специалисты</button>

@@ -3,15 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>PROMarket — Premium Service</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <script>
-        (function() {
-            var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            if (isMobile || window.innerWidth < 768) {
-                document.documentElement.classList.add('mobile');
-            }
-        })();
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Leaflet CSS и JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -23,244 +15,8 @@
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- Подключаем переименованные файлы -->
-    <link rel="stylesheet" href="style.final.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <style>
-        /* === МОБИЛЬНЫЕ СТИЛИ С ПРИОРИТЕТОМ === */
-        @media (max-width: 768px) {
-            .search-bar {
-                background: transparent !important;
-                border: none !important;
-                width: 120px !important;
-                margin: 0 auto !important;
-                padding: 0 !important;
-            }
-            .search-bar input {
-                font-size: 0.8rem !important;
-                background: transparent !important;
-                border: none !important;
-                outline: none !important;
-                width: 100% !important;
-                margin-left: 5px !important;
-                color: var(--text-main) !important;
-            }
-            .search-bar i {
-                color: var(--text-muted) !important;
-            }
-            .desktop-only {
-                display: none !important;
-            }
-            .notification-badge {
-                display: none !important;
-            }
-            .grid {
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 4px !important;
-            }
-            .card {
-                padding: 4px !important;
-                width: 100% !important;
-                min-width: 0 !important;
-            }
-            .card h3 {
-                font-size: 0.75rem !important;
-                margin: 2px 0 !important;
-                word-break: break-word !important;
-            }
-            .category-tag {
-                font-size: 0.45rem !important;
-                padding: 2px 3px !important;
-            }
-            .price {
-                font-size: 0.85rem !important;
-                margin: 2px 0 !important;
-            }
-            .price span {
-                font-size: 0.6rem !important;
-            }
-            .card p {
-                display: none !important;
-            }
-            .card .btn-outline:last-child {
-                display: none !important;
-            }
-            .btn-primary {
-                padding: 4px !important;
-                font-size: 0.6rem !important;
-                min-height: 26px !important;
-            }
-            .card-header {
-                margin-bottom: 2px !important;
-                align-items: center !important;
-            }
-            .fav-btn,
-            .compass-icon,
-            .fa-share-alt {
-                font-size: 0.7rem !important;
-                min-height: 26px !important;
-                min-width: 26px !important;
-            }
-            .distanceHtml {
-                font-size: 0.55rem !important;
-            }
-            .btn, .fav-btn, .compare-checkbox, .compass-icon {
-                min-height: 26px !important;
-                min-width: 26px !important;
-            }
-            .compare-checkbox {
-                width: 12px !important;
-                height: 12px !important;
-            }
-            .avatar {
-                width: 24px !important;
-                height: 24px !important;
-                font-size: 0.8rem !important;
-                margin-right: 4px !important;
-            }
-            /* Карточки заказов на мобильных */
-            .view-orders .grid {
-                grid-template-columns: 1fr !important;
-                gap: 15px !important;
-            }
-            .view-orders .card {
-                padding: 15px !important;
-                font-size: 1rem !important;
-            }
-            .view-orders .card h3 {
-                font-size: 1.1rem !important;
-                margin: 5px 0 !important;
-            }
-            .view-orders .card p {
-                display: block !important;
-                font-size: 0.9rem !important;
-            }
-            .view-orders .price {
-                font-size: 1.2rem !important;
-            }
-            .view-orders .card .btn-outline {
-                display: block !important;
-                min-height: 40px !important;
-                font-size: 0.9rem !important;
-                padding: 8px !important;
-            }
-        }
-        /* Дублируем для класса .mobile (на случай, если медиа-запрос не сработает) */
-        .mobile .search-bar {
-            background: transparent !important;
-            border: none !important;
-            width: 120px !important;
-            margin: 0 auto !important;
-            padding: 0 !important;
-        }
-        .mobile .search-bar input {
-            font-size: 0.8rem !important;
-            background: transparent !important;
-            border: none !important;
-            outline: none !important;
-            width: 100% !important;
-            margin-left: 5px !important;
-            color: var(--text-main) !important;
-        }
-        .mobile .search-bar i {
-            color: var(--text-muted) !important;
-        }
-        .mobile .desktop-only {
-            display: none !important;
-        }
-        .mobile .notification-badge {
-            display: none !important;
-        }
-        .mobile .grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 4px !important;
-        }
-        .mobile .card {
-            padding: 4px !important;
-            width: 100% !important;
-            min-width: 0 !important;
-        }
-        .mobile .card h3 {
-            font-size: 0.75rem !important;
-            margin: 2px 0 !important;
-            word-break: break-word !important;
-        }
-        .mobile .category-tag {
-            font-size: 0.45rem !important;
-            padding: 2px 3px !important;
-        }
-        .mobile .price {
-            font-size: 0.85rem !important;
-            margin: 2px 0 !important;
-        }
-        .mobile .price span {
-            font-size: 0.6rem !important;
-        }
-        .mobile .card p {
-            display: none !important;
-        }
-        .mobile .card .btn-outline:last-child {
-            display: none !important;
-        }
-        .mobile .btn-primary {
-            padding: 4px !important;
-            font-size: 0.6rem !important;
-            min-height: 26px !important;
-        }
-        .mobile .card-header {
-            margin-bottom: 2px !important;
-            align-items: center !important;
-        }
-        .mobile .fav-btn,
-        .mobile .compass-icon,
-        .mobile .fa-share-alt {
-            font-size: 0.7rem !important;
-            min-height: 26px !important;
-            min-width: 26px !important;
-        }
-        .mobile .distanceHtml {
-            font-size: 0.55rem !important;
-        }
-        .mobile .btn, .mobile .fav-btn, .mobile .compare-checkbox, .mobile .compass-icon {
-            min-height: 26px !important;
-            min-width: 26px !important;
-        }
-        .mobile .compare-checkbox {
-            width: 12px !important;
-            height: 12px !important;
-        }
-        .mobile .avatar {
-            width: 24px !important;
-            height: 24px !important;
-            font-size: 0.8rem !important;
-            margin-right: 4px !important;
-        }
-        .mobile .view-orders .grid {
-            grid-template-columns: 1fr !important;
-            gap: 15px !important;
-        }
-        .mobile .view-orders .card {
-            padding: 15px !important;
-            font-size: 1rem !important;
-        }
-        .mobile .view-orders .card h3 {
-            font-size: 1.1rem !important;
-            margin: 5px 0 !important;
-        }
-        .mobile .view-orders .card p {
-            display: block !important;
-            font-size: 0.9rem !important;
-        }
-        .mobile .view-orders .price {
-            font-size: 1.2rem !important;
-        }
-        .mobile .view-orders .card .btn-outline {
-            display: block !important;
-            min-height: 40px !important;
-            font-size: 0.9rem !important;
-            padding: 8px !important;
-        }
-    </style>
 </head>
 <body>
     <div id="particles-js"></div>
@@ -273,7 +29,6 @@
             <input type="text" id="main-search" placeholder="Поиск мастеров..." autofocus oninput="debounce(getPros, 500)()">
         </div>
         <div style="display: flex; align-items: center;">
-            <!-- Колокольчик (скрыт на мобильных) -->
             <div class="notification-badge" id="notificationBell" onclick="showNotifications()" title="Уведомления">
                 <i class="fas fa-bell fa-lg"></i>
                 <span class="badge hidden" id="notificationCount">0</span>
@@ -284,7 +39,6 @@
                         <i class="fas fa-user-circle"></i> <span>Войти</span>
                     </button>
                 </div>
-                <!-- Кнопка сравнения (видна на ПК) -->
                 <button id="compare-btn" class="btn btn-outline" style="margin-left:10px;" title="Сравнить выбранных мастеров">
                     <i class="fas fa-balance-scale"></i>
                 </button>
@@ -295,15 +49,12 @@
                     <i class="fas fa-moon"></i>
                 </button>
             </div>
-            <!-- Кнопка гамбургер с бейджем уведомлений -->
             <button id="menu-toggle" class="btn btn-outline" style="margin-left:10px;" title="Меню">
                 <i class="fas fa-bars"></i>
-                <span id="hamburger-notif-count" class="badge hidden">0</span>
             </button>
         </div>
     </header>
 
-    <!-- Выпадающее гамбургер-меню -->
     <div id="hamburger-menu" class="hamburger-menu hidden">
         <ul>
             <li onclick="showView('orders'); toggleHamburgerMenu()"><i class="fas fa-shopping-bag"></i> Мои заказы</li>
@@ -311,10 +62,6 @@
             <li onclick="handleAuthAction(); toggleHamburgerMenu()"><i class="fas fa-sign-in-alt"></i> <span id="menu-auth-text">Войти</span></li>
             <li onclick="toggleTheme(); toggleHamburgerMenu()"><i class="fas fa-moon"></i> <span id="menu-theme-text">Тёмная тема</span></li>
             <li onclick="toggleSidebar(); toggleHamburgerMenu()"><i class="fas fa-sliders-h"></i> Фильтры</li>
-            <li onclick="showNotifications(); toggleHamburgerMenu()">
-                <i class="fas fa-bell"></i> Уведомления
-                <span id="menu-notif-count" class="badge hidden">0</span>
-            </li>
             <li onclick="clearAllFavorites(); toggleHamburgerMenu()"><i class="fas fa-heart-broken"></i> Очистить избранное</li>
             <li onclick="showStatistics(); toggleHamburgerMenu()"><i class="fas fa-chart-bar"></i> Статистика</li>
             <li onclick="randomMaster(); toggleHamburgerMenu()"><i class="fas fa-random"></i> Случайный мастер</li>
@@ -329,13 +76,12 @@
             </div>
             <div id="map" class="styled-map"></div>
             <div class="tabs-nav">
-                <button class="tab-btn active" id="t-pros" onclick="showView('pros')">Специалисты</button>
-                <button class="tab-btn" id="t-orders" onclick="showView('orders')">Мои заказы</button>
+                <button class="tab-btn active" id="t-pros" onclick="showView('pros')" title="Список специалистов">Специалисты</button>
+                <button class="tab-btn" id="t-orders" onclick="showView('orders')" title="Ваши заказы">Мои заказы</button>
             </div>
             <div class="filter-content">
-                <!-- фильтры -->
                 <div class="filter-group">
-                    <label>Категория услуг</label>
+                    <label title="Выберите категорию">Категория услуг</label>
                     <select id="f-cat" onchange="getPros()">
                         <option value="">Все категории</option>
                         <option value="Ремонт">🛠 Ремонт</option>
@@ -346,7 +92,7 @@
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label>Минимальный рейтинг</label>
+                    <label title="Минимальный рейтинг">Минимальный рейтинг</label>
                     <select id="f-rate" onchange="getPros()">
                         <option value="0">Любой</option>
                         <option value="4.5">Высокий (4.5+ ★)</option>
@@ -354,7 +100,7 @@
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label>Максимальная цена (₽)</label>
+                    <label title="Оставьте пустым, если без ограничений">Максимальная цена (₽)</label>
                     <input type="number" id="f-price" placeholder="Любая" oninput="getPros()">
                 </div>
                 <div class="filter-group">
@@ -387,7 +133,6 @@
             <div id="view-pros" class="view">
                 <div id="pros-loader" class="loader hidden">Загрузка специалистов...</div>
                 <div id="pros-list" class="grid"></div>
-                <div id="scroll-indicator" style="height: 3px; background: var(--primary); width: 0%; position: sticky; bottom: 0; left: 0;"></div>
             </div>
             <div id="view-orders" class="view hidden">
                 <div id="orders-loader" class="loader hidden">Загрузка заказов...</div>
@@ -396,7 +141,7 @@
         </main>
     </div>
 
-    <!-- Модальные окна -->
+    <!-- Модальные окна (оставляем как есть) -->
     <div class="modal-bg" id="modal-auth">
         <div class="modal-box">
             <h2>С возвращением!</h2>
@@ -456,8 +201,10 @@
     </div>
 
     <div id="toast-container"></div>
+
+    <!-- Кнопка "Наверх" -->
     <button id="scrollTop" class="btn btn-primary" title="Наверх">↑</button>
 
-    <script src="client.final.js"></script>
+    <script src="client.js"></script>
 </body>
 </html>

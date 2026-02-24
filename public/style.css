@@ -655,26 +655,30 @@ select, input[type="number"], input[type="text"] {
     }
     .grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 3px;
+        gap: 4px;
     }
+    /* Стили для карточек специалистов (компактные) */
     .card {
         padding: 4px;
         box-shadow: none;
         border: 1px solid rgba(0,0,0,0.05);
         width: 100%;
-        min-width: 0; /* предотвращает переполнение */
+        min-width: 0;
     }
     .card h3 {
         font-size: 0.75rem;
         margin: 2px 0;
+        word-break: break-word;
     }
     .category-tag {
         font-size: 0.45rem;
         padding: 2px 3px;
+        word-break: break-word;
     }
     .price {
         font-size: 0.85rem;
         margin: 2px 0;
+        word-break: break-word;
     }
     .price span {
         font-size: 0.6rem;
@@ -745,6 +749,40 @@ select, input[type="number"], input[type="text"] {
         margin-bottom: 10px;
     }
 
+    /* Стили для карточек заказов на мобильных (нормальный размер) */
+    .view-orders .grid {
+        grid-template-columns: 1fr; /* одна колонка для удобства */
+        gap: 15px;
+    }
+    .view-orders .card {
+        padding: 15px;
+        font-size: 1rem;
+    }
+    .view-orders .card h3 {
+        font-size: 1.1rem;
+        margin: 5px 0;
+    }
+    .view-orders .card p {
+        display: block;
+        font-size: 0.9rem;
+    }
+    .view-orders .price {
+        font-size: 1.2rem;
+    }
+    .view-orders .btn-outline:last-child {
+        display: block; /* кнопка чата не нужна, но можно оставить */
+    }
+    .view-orders .btn-primary {
+        min-height: 40px;
+        font-size: 0.9rem;
+    }
+    .view-orders .card .btn-outline {
+        display: block;
+        min-height: 40px;
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
     /* Стили для таблицы сравнения на мобильных */
     #compare-modal .modal-box {
         padding: 10px;
@@ -760,14 +798,6 @@ select, input[type="number"], input[type="text"] {
     .compare-table td {
         padding: 4px;
         white-space: nowrap;
-    }
-
-    /* Кнопка завершения заказа не должна скрываться */
-    .view-orders .card .btn-outline {
-        display: block;
-        min-height: 30px;
-        font-size: 0.7rem;
-        padding: 6px;
     }
 }
 
@@ -871,8 +901,9 @@ select, input[type="number"], input[type="text"] {
 }
 .mobile .grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 3px;
+    gap: 4px;
 }
+/* Карточки специалистов компактные */
 .mobile .card {
     padding: 4px;
     box-shadow: none;
@@ -883,14 +914,17 @@ select, input[type="number"], input[type="text"] {
 .mobile .card h3 {
     font-size: 0.75rem;
     margin: 2px 0;
+    word-break: break-word;
 }
 .mobile .category-tag {
     font-size: 0.45rem;
     padding: 2px 3px;
+    word-break: break-word;
 }
 .mobile .price {
     font-size: 0.85rem;
     margin: 2px 0;
+    word-break: break-word;
 }
 .mobile .price span {
     font-size: 0.6rem;
@@ -960,6 +994,39 @@ select, input[type="number"], input[type="text"] {
 .mobile .filter-group {
     margin-bottom: 10px;
 }
+/* Карточки заказов на мобильных нормального размера */
+.mobile .view-orders .grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+.mobile .view-orders .card {
+    padding: 15px;
+    font-size: 1rem;
+}
+.mobile .view-orders .card h3 {
+    font-size: 1.1rem;
+    margin: 5px 0;
+}
+.mobile .view-orders .card p {
+    display: block;
+    font-size: 0.9rem;
+}
+.mobile .view-orders .price {
+    font-size: 1.2rem;
+}
+.mobile .view-orders .btn-outline:last-child {
+    display: block;
+}
+.mobile .view-orders .btn-primary {
+    min-height: 40px;
+    font-size: 0.9rem;
+}
+.mobile .view-orders .card .btn-outline {
+    display: block;
+    min-height: 40px;
+    font-size: 0.9rem;
+    padding: 8px;
+}
 .mobile #compare-modal .modal-box {
     padding: 10px;
 }
@@ -974,12 +1041,6 @@ select, input[type="number"], input[type="text"] {
 .mobile .compare-table td {
     padding: 4px;
     white-space: nowrap;
-}
-.mobile .view-orders .card .btn-outline {
-    display: block;
-    min-height: 30px;
-    font-size: 0.7rem;
-    padding: 6px;
 }
 .mobile .hamburger-menu li .badge {
     position: static;

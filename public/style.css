@@ -572,7 +572,7 @@ select, input[type="number"], input[type="text"] {
     .search-bar {
         background: transparent;
         border: none;
-        width: 160px;
+        width: 120px;
         margin: 0 auto;
         padding: 0;
     }
@@ -655,24 +655,26 @@ select, input[type="number"], input[type="text"] {
     }
     .grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 5px;
+        gap: 3px;
     }
     .card {
-        padding: 6px;
+        padding: 4px;
         box-shadow: none;
         border: 1px solid rgba(0,0,0,0.05);
+        width: 100%;
+        min-width: 0; /* предотвращает переполнение */
     }
     .card h3 {
-        font-size: 0.8rem;
-        margin: 3px 0;
+        font-size: 0.75rem;
+        margin: 2px 0;
     }
     .category-tag {
-        font-size: 0.5rem;
-        padding: 2px 4px;
+        font-size: 0.45rem;
+        padding: 2px 3px;
     }
     .price {
-        font-size: 0.9rem;
-        margin: 3px 0;
+        font-size: 0.85rem;
+        margin: 2px 0;
     }
     .price span {
         font-size: 0.6rem;
@@ -681,45 +683,45 @@ select, input[type="number"], input[type="text"] {
         display: none;
     }
     .card .btn-outline:last-child {
-        display: none;
+        display: none; /* скрываем кнопку чата */
     }
     .btn-primary {
-        padding: 5px;
-        font-size: 0.65rem;
-        min-height: 30px;
+        padding: 4px;
+        font-size: 0.6rem;
+        min-height: 26px;
     }
     .card-header {
-        margin-bottom: 3px;
+        margin-bottom: 2px;
         align-items: center;
     }
     .fav-btn,
     .compass-icon,
     .fa-share-alt {
-        font-size: 0.8rem;
-        min-height: 30px;
-        min-width: 30px;
+        font-size: 0.7rem;
+        min-height: 26px;
+        min-width: 26px;
     }
     .distanceHtml {
-        font-size: 0.6rem;
+        font-size: 0.55rem;
     }
     .btn, .fav-btn, .compare-checkbox, .compass-icon {
-        min-height: 30px;
-        min-width: 30px;
+        min-height: 26px;
+        min-width: 26px;
     }
     .compare-checkbox {
         display: inline-flex;
-        width: 14px;
-        height: 14px;
+        width: 12px;
+        height: 12px;
     }
     .avatar {
-        width: 28px;
-        height: 28px;
-        font-size: 0.9rem;
-        margin-right: 5px;
+        width: 24px;
+        height: 24px;
+        font-size: 0.8rem;
+        margin-right: 4px;
     }
     #scrollTop {
-        width: 32px;
-        height: 32px;
+        width: 30px;
+        height: 30px;
         bottom: 8px;
         right: 8px;
         opacity: 0.6;
@@ -736,12 +738,36 @@ select, input[type="number"], input[type="text"] {
         width: 0%;
         transition: width 0.1s;
     }
-    /* Поднимаем фильтры */
     .filter-content {
         padding-top: 5px;
     }
     .filter-group {
-        margin-bottom: 12px;
+        margin-bottom: 10px;
+    }
+
+    /* Стили для таблицы сравнения на мобильных */
+    #compare-modal .modal-box {
+        padding: 10px;
+    }
+    #compare-content {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .compare-table {
+        font-size: 0.7rem;
+    }
+    .compare-table th,
+    .compare-table td {
+        padding: 4px;
+        white-space: nowrap;
+    }
+
+    /* Кнопка завершения заказа не должна скрываться */
+    .view-orders .card .btn-outline {
+        display: block;
+        min-height: 30px;
+        font-size: 0.7rem;
+        padding: 6px;
     }
 }
 
@@ -755,7 +781,7 @@ select, input[type="number"], input[type="text"] {
 .mobile .search-bar {
     background: transparent;
     border: none;
-    width: 160px;
+    width: 120px;
     margin: 0 auto;
     padding: 0;
 }
@@ -845,24 +871,26 @@ select, input[type="number"], input[type="text"] {
 }
 .mobile .grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 5px;
+    gap: 3px;
 }
 .mobile .card {
-    padding: 6px;
+    padding: 4px;
     box-shadow: none;
     border: 1px solid rgba(0,0,0,0.05);
+    width: 100%;
+    min-width: 0;
 }
 .mobile .card h3 {
-    font-size: 0.8rem;
-    margin: 3px 0;
+    font-size: 0.75rem;
+    margin: 2px 0;
 }
 .mobile .category-tag {
-    font-size: 0.5rem;
-    padding: 2px 4px;
+    font-size: 0.45rem;
+    padding: 2px 3px;
 }
 .mobile .price {
-    font-size: 0.9rem;
-    margin: 3px 0;
+    font-size: 0.85rem;
+    margin: 2px 0;
 }
 .mobile .price span {
     font-size: 0.6rem;
@@ -874,42 +902,42 @@ select, input[type="number"], input[type="text"] {
     display: none;
 }
 .mobile .btn-primary {
-    padding: 5px;
-    font-size: 0.65rem;
-    min-height: 30px;
+    padding: 4px;
+    font-size: 0.6rem;
+    min-height: 26px;
 }
 .mobile .card-header {
-    margin-bottom: 3px;
+    margin-bottom: 2px;
     align-items: center;
 }
 .mobile .fav-btn,
 .mobile .compass-icon,
 .mobile .fa-share-alt {
-    font-size: 0.8rem;
-    min-height: 30px;
-    min-width: 30px;
+    font-size: 0.7rem;
+    min-height: 26px;
+    min-width: 26px;
 }
 .mobile .distanceHtml {
-    font-size: 0.6rem;
+    font-size: 0.55rem;
 }
 .mobile .btn, .mobile .fav-btn, .mobile .compare-checkbox, .mobile .compass-icon {
-    min-height: 30px;
-    min-width: 30px;
+    min-height: 26px;
+    min-width: 26px;
 }
 .mobile .compare-checkbox {
     display: inline-flex;
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
 }
 .mobile .avatar {
-    width: 28px;
-    height: 28px;
-    font-size: 0.9rem;
-    margin-right: 5px;
+    width: 24px;
+    height: 24px;
+    font-size: 0.8rem;
+    margin-right: 4px;
 }
 .mobile #scrollTop {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     bottom: 8px;
     right: 8px;
     opacity: 0.6;
@@ -930,7 +958,28 @@ select, input[type="number"], input[type="text"] {
     padding-top: 5px;
 }
 .mobile .filter-group {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
+}
+.mobile #compare-modal .modal-box {
+    padding: 10px;
+}
+.mobile #compare-content {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.mobile .compare-table {
+    font-size: 0.7rem;
+}
+.mobile .compare-table th,
+.mobile .compare-table td {
+    padding: 4px;
+    white-space: nowrap;
+}
+.mobile .view-orders .card .btn-outline {
+    display: block;
+    min-height: 30px;
+    font-size: 0.7rem;
+    padding: 6px;
 }
 .mobile .hamburger-menu li .badge {
     position: static;

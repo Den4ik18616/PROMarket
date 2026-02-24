@@ -25,6 +25,241 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        /* === МОБИЛЬНЫЕ СТИЛИ С ПРИОРИТЕТОМ === */
+        @media (max-width: 768px) {
+            .search-bar {
+                background: transparent !important;
+                border: none !important;
+                width: 120px !important;
+                margin: 0 auto !important;
+                padding: 0 !important;
+            }
+            .search-bar input {
+                font-size: 0.8rem !important;
+                background: transparent !important;
+                border: none !important;
+                outline: none !important;
+                width: 100% !important;
+                margin-left: 5px !important;
+                color: var(--text-main) !important;
+            }
+            .search-bar i {
+                color: var(--text-muted) !important;
+            }
+            .desktop-only {
+                display: none !important;
+            }
+            .notification-badge {
+                display: none !important;
+            }
+            .grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 4px !important;
+            }
+            .card {
+                padding: 4px !important;
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+            .card h3 {
+                font-size: 0.75rem !important;
+                margin: 2px 0 !important;
+                word-break: break-word !important;
+            }
+            .category-tag {
+                font-size: 0.45rem !important;
+                padding: 2px 3px !important;
+            }
+            .price {
+                font-size: 0.85rem !important;
+                margin: 2px 0 !important;
+            }
+            .price span {
+                font-size: 0.6rem !important;
+            }
+            .card p {
+                display: none !important;
+            }
+            .card .btn-outline:last-child {
+                display: none !important;
+            }
+            .btn-primary {
+                padding: 4px !important;
+                font-size: 0.6rem !important;
+                min-height: 26px !important;
+            }
+            .card-header {
+                margin-bottom: 2px !important;
+                align-items: center !important;
+            }
+            .fav-btn,
+            .compass-icon,
+            .fa-share-alt {
+                font-size: 0.7rem !important;
+                min-height: 26px !important;
+                min-width: 26px !important;
+            }
+            .distanceHtml {
+                font-size: 0.55rem !important;
+            }
+            .btn, .fav-btn, .compare-checkbox, .compass-icon {
+                min-height: 26px !important;
+                min-width: 26px !important;
+            }
+            .compare-checkbox {
+                width: 12px !important;
+                height: 12px !important;
+            }
+            .avatar {
+                width: 24px !important;
+                height: 24px !important;
+                font-size: 0.8rem !important;
+                margin-right: 4px !important;
+            }
+            /* Карточки заказов на мобильных */
+            .view-orders .grid {
+                grid-template-columns: 1fr !important;
+                gap: 15px !important;
+            }
+            .view-orders .card {
+                padding: 15px !important;
+                font-size: 1rem !important;
+            }
+            .view-orders .card h3 {
+                font-size: 1.1rem !important;
+                margin: 5px 0 !important;
+            }
+            .view-orders .card p {
+                display: block !important;
+                font-size: 0.9rem !important;
+            }
+            .view-orders .price {
+                font-size: 1.2rem !important;
+            }
+            .view-orders .card .btn-outline {
+                display: block !important;
+                min-height: 40px !important;
+                font-size: 0.9rem !important;
+                padding: 8px !important;
+            }
+        }
+        /* Дублируем для класса .mobile (на случай, если медиа-запрос не сработает) */
+        .mobile .search-bar {
+            background: transparent !important;
+            border: none !important;
+            width: 120px !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+        }
+        .mobile .search-bar input {
+            font-size: 0.8rem !important;
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            width: 100% !important;
+            margin-left: 5px !important;
+            color: var(--text-main) !important;
+        }
+        .mobile .search-bar i {
+            color: var(--text-muted) !important;
+        }
+        .mobile .desktop-only {
+            display: none !important;
+        }
+        .mobile .notification-badge {
+            display: none !important;
+        }
+        .mobile .grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 4px !important;
+        }
+        .mobile .card {
+            padding: 4px !important;
+            width: 100% !important;
+            min-width: 0 !important;
+        }
+        .mobile .card h3 {
+            font-size: 0.75rem !important;
+            margin: 2px 0 !important;
+            word-break: break-word !important;
+        }
+        .mobile .category-tag {
+            font-size: 0.45rem !important;
+            padding: 2px 3px !important;
+        }
+        .mobile .price {
+            font-size: 0.85rem !important;
+            margin: 2px 0 !important;
+        }
+        .mobile .price span {
+            font-size: 0.6rem !important;
+        }
+        .mobile .card p {
+            display: none !important;
+        }
+        .mobile .card .btn-outline:last-child {
+            display: none !important;
+        }
+        .mobile .btn-primary {
+            padding: 4px !important;
+            font-size: 0.6rem !important;
+            min-height: 26px !important;
+        }
+        .mobile .card-header {
+            margin-bottom: 2px !important;
+            align-items: center !important;
+        }
+        .mobile .fav-btn,
+        .mobile .compass-icon,
+        .mobile .fa-share-alt {
+            font-size: 0.7rem !important;
+            min-height: 26px !important;
+            min-width: 26px !important;
+        }
+        .mobile .distanceHtml {
+            font-size: 0.55rem !important;
+        }
+        .mobile .btn, .mobile .fav-btn, .mobile .compare-checkbox, .mobile .compass-icon {
+            min-height: 26px !important;
+            min-width: 26px !important;
+        }
+        .mobile .compare-checkbox {
+            width: 12px !important;
+            height: 12px !important;
+        }
+        .mobile .avatar {
+            width: 24px !important;
+            height: 24px !important;
+            font-size: 0.8rem !important;
+            margin-right: 4px !important;
+        }
+        .mobile .view-orders .grid {
+            grid-template-columns: 1fr !important;
+            gap: 15px !important;
+        }
+        .mobile .view-orders .card {
+            padding: 15px !important;
+            font-size: 1rem !important;
+        }
+        .mobile .view-orders .card h3 {
+            font-size: 1.1rem !important;
+            margin: 5px 0 !important;
+        }
+        .mobile .view-orders .card p {
+            display: block !important;
+            font-size: 0.9rem !important;
+        }
+        .mobile .view-orders .price {
+            font-size: 1.2rem !important;
+        }
+        .mobile .view-orders .card .btn-outline {
+            display: block !important;
+            min-height: 40px !important;
+            font-size: 0.9rem !important;
+            padding: 8px !important;
+        }
+    </style>
 </head>
 <body>
     <div id="particles-js"></div>
@@ -67,6 +302,7 @@
         </div>
     </header>
 
+    <!-- Выпадающее гамбургер-меню -->
     <div id="hamburger-menu" class="hamburger-menu hidden">
         <ul>
             <li onclick="showView('orders'); toggleHamburgerMenu()"><i class="fas fa-shopping-bag"></i> Мои заказы</li>
@@ -159,7 +395,7 @@
         </main>
     </div>
 
-    <!-- модальные окна (без изменений) -->
+    <!-- Модальные окна -->
     <div class="modal-bg" id="modal-auth">
         <div class="modal-box">
             <h2>С возвращением!</h2>
@@ -170,6 +406,7 @@
             <button class="btn btn-outline" style="width:100%; margin-top:12px" onclick="closeModal('modal-auth')">Закрыть</button>
         </div>
     </div>
+
     <div class="modal-bg" id="modal-booking">
         <div class="modal-box">
             <h2>Оформление заказа</h2>
@@ -188,6 +425,7 @@
             <button class="btn btn-outline" style="width:100%; margin-top:12px" onclick="closeModal('modal-booking')">Отмена</button>
         </div>
     </div>
+
     <div class="modal-bg" id="modal-notifications">
         <div class="modal-box">
             <h2>Уведомления</h2>
@@ -195,6 +433,7 @@
             <button class="btn btn-outline" style="width:100%; margin-top:12px" onclick="closeModal('modal-notifications')">Закрыть</button>
         </div>
     </div>
+
     <div class="modal-bg" id="modal-chat">
         <div class="modal-box">
             <h2 id="chat-with"></h2>
@@ -206,6 +445,7 @@
             <button class="btn btn-outline" style="width:100%; margin-top:12px" onclick="closeModal('modal-chat')">Закрыть</button>
         </div>
     </div>
+
     <div id="compare-modal" class="modal-bg" style="display:none;">
         <div class="modal-box" style="width:800px; max-width:95%;">
             <h2>Сравнение мастеров</h2>

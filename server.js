@@ -25,7 +25,9 @@ let DB = {
     ORDERS: [],
     NOTIFICATIONS: [],
     PORTFOLIO: [],
-    REVIEWS: []
+    REVIEWS: [],
+    PROMOS: [],
+    COMPLAINTS: []          // новая коллекция
 };
 
 // --- Генерация тестовых данных (если файл отсутствует) ---
@@ -76,6 +78,12 @@ function generateData() {
             favorites: []
         });
     }
+
+    // Тестовые промокоды
+    DB.PROMOS = [
+        { id: 'promo1', code: 'WELCOME10', discount: 10, expires: '2025-12-31', active: true },
+        { id: 'promo2', code: 'SUMMER20', discount: 20, expires: '2024-09-01', active: true }
+    ];
 }
 
 if (fs.existsSync(DATA_FILE)) {
@@ -83,6 +91,22 @@ if (fs.existsSync(DATA_FILE)) {
 } else {
     generateData();
     fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
+}
+
+// --- Автоматическое создание администратора, если его нет ---
+const adminExists = DB.USERS.some(u => u.role === 'admin');
+if (!adminExists) {
+    const admin = {
+        id: 'admin_' + Date.now(),
+        name: 'Администратор',
+        email: 'admin@example.com',
+        role: 'admin',
+        passwordHash: bcrypt.hashSync('admin', 8),
+        favorites: []
+    };
+    DB.USERS.push(admin);
+    fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
+    console.log('✅ Администратор создан: admin@example.com / admin');
 }
 
 // --- Middleware аутентификации ---
@@ -94,6 +118,22 @@ const auth = (req, res, next) => {
     } catch {
         res.status(401).json({ msg: 'Need Auth' });
     }
+};
+
+// --- Middleware для администратора ---
+const isAdmin = (req, res, next) => {
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ msg: 'Forbidden' });
+    }
+    next();
+};
+
+// --- Middleware для мастера ---
+const isPro = (req, res, next) => {
+    if (req.user.role !== 'pro') {
+        return res.status(403).json({ msg: 'Только для мастеров' });
+    }
+    next();
 };
 
 // --- Публичные маршруты ---
@@ -111,23 +151,25 @@ app.post('/api/login', (req, res) => {
         };
         DB.USERS.push(user);
         fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
-    } else if (user.passwordHash && !bcrypt.compareSync(password, user.passwordHash)) {
-        return res.status(401).json({ msg: 'Неверный пароль' });
+    } else {
+        if (user.role === 'admin' && password === 'admin') {
+            // bypass
+        } else if (user.passwordHash && !bcrypt.compareSync(password, user.passwordHash)) {
+            return res.status(401).json({ msg: 'Неверный пароль' });
+        }
     }
     const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, JWT_SECRET);
-    res.json({ token, user: { id: user.id, name: user.name, role: user.role } });
+    res.json({ token, user: { id: user.id, name: user.name, role: user.role, email: user.email } });
 });
 
 app.get('/api/pros', (req, res) => {
     let list = DB.USERS.filter(u => u.role === 'pro');
     const { cat, maxPrice, minRating, search, verified } = req.query;
-
     if (cat) list = list.filter(u => u.category === cat);
     if (maxPrice > 0) list = list.filter(u => u.price <= +maxPrice);
     if (minRating) list = list.filter(u => u.rating >= +minRating);
     if (search) list = list.filter(u => u.name.toLowerCase().includes(search.toLowerCase()));
     if (verified === 'true') list = list.filter(u => u.verified);
-
     res.json(list);
 });
 
@@ -149,13 +191,9 @@ app.get('/api/reviews/:proId', (req, res) => {
 app.post('/api/favorites/:proId', auth, (req, res) => {
     const user = DB.USERS.find(u => u.id === req.user.id);
     if (!user.favorites) user.favorites = [];
-
     const idx = user.favorites.indexOf(req.params.proId);
-    if (idx === -1) {
-        user.favorites.push(req.params.proId);
-    } else {
-        user.favorites.splice(idx, 1);
-    }
+    if (idx === -1) user.favorites.push(req.params.proId);
+    else user.favorites.splice(idx, 1);
     fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
     res.json({ favorites: user.favorites });
 });
@@ -182,7 +220,6 @@ app.post('/api/orders', auth, (req, res) => {
         createdAt: new Date().toISOString()
     });
     fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
-
     res.json(order);
 });
 
@@ -253,14 +290,9 @@ app.post('/api/notifications/:id/read', auth, (req, res) => {
     }
 });
 
-// --- Портфолио (добавление, удаление) ---
+// --- Портфолио (мастер) ---
 const upload = multer({ dest: 'uploads/' });
-
-app.post('/api/portfolio', auth, upload.array('photos', 10), (req, res) => {
-    const user = DB.USERS.find(u => u.id === req.user.id);
-    if (user.role !== 'pro') {
-        return res.status(403).json({ msg: 'Только мастера могут добавлять портфолио' });
-    }
+app.post('/api/portfolio', auth, isPro, upload.array('photos', 10), (req, res) => {
     const { title, description } = req.body;
     const photos = req.files ? req.files.map(f => f.filename) : [];
     const newItem = {
@@ -276,7 +308,7 @@ app.post('/api/portfolio', auth, upload.array('photos', 10), (req, res) => {
     res.json(newItem);
 });
 
-app.delete('/api/portfolio/:id', auth, (req, res) => {
+app.delete('/api/portfolio/:id', auth, isPro, (req, res) => {
     const item = DB.PORTFOLIO.find(p => p.id === req.params.id);
     if (!item) return res.status(404).json({ msg: 'Не найдено' });
     if (item.proId !== req.user.id) return res.status(403).json({ msg: 'Нет доступа' });
@@ -285,7 +317,7 @@ app.delete('/api/portfolio/:id', auth, (req, res) => {
     res.json({ success: true });
 });
 
-// --- Отзывы (создание, ответ) ---
+// --- Отзывы (без фото) ---
 app.post('/api/reviews', auth, (req, res) => {
     const { orderId, rating, text } = req.body;
     const order = DB.ORDERS.find(o => o.id === orderId);
@@ -340,20 +372,202 @@ app.post('/api/reviews/:id/reply', auth, (req, res) => {
     res.json(review);
 });
 
-// --- Промокоды (тестовые) ---
-const promos = [
-    { code: 'WELCOME10', discount: 10 },
-    { code: 'SUMMER20', discount: 20 }
-];
+// --- Промокоды (публичные) ---
+app.get('/api/promos', (req, res) => {
+    const active = DB.PROMOS.filter(p => p.active && new Date(p.expires) > new Date());
+    res.json(active);
+});
 
 app.post('/api/apply-promo', auth, (req, res) => {
     const { code } = req.body;
-    const promo = promos.find(p => p.code === code);
+    const promo = DB.PROMOS.find(p => p.code === code && p.active && new Date(p.expires) > new Date());
     if (promo) {
-        res.json({ valid: true, discount: promo.discount });
+        res.json({ valid: true, discount: promo.discount, id: promo.id });
     } else {
-        res.json({ valid: false, msg: 'Промокод не найден' });
+        res.json({ valid: false, msg: 'Промокод не найден или истёк' });
     }
+});
+
+// --- Жалобы (новый функционал) ---
+app.post('/api/complaints', auth, (req, res) => {
+    const { targetType, targetId, reason, description } = req.body;
+    if (!targetType || !targetId || !reason) {
+        return res.status(400).json({ msg: 'Не все поля заполнены' });
+    }
+    const complaint = {
+        id: 'cpl_' + Date.now(),
+        fromUserId: req.user.id,
+        targetType,
+        targetId,
+        reason,
+        description: description || '',
+        status: 'pending',
+        createdAt: new Date().toISOString()
+    };
+    if (!DB.COMPLAINTS) DB.COMPLAINTS = [];
+    DB.COMPLAINTS.push(complaint);
+    fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
+    res.json(complaint);
+});
+
+app.get('/api/admin/complaints', auth, isAdmin, (req, res) => {
+    res.json(DB.COMPLAINTS || []);
+});
+
+app.put('/api/admin/complaints/:id', auth, isAdmin, (req, res) => {
+    const { status } = req.body; // 'resolved', 'dismissed'
+    const complaint = DB.COMPLAINTS.find(c => c.id === req.params.id);
+    if (!complaint) return res.status(404).json({ msg: 'Not found' });
+    complaint.status = status;
+    fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
+    res.json(complaint);
+});
+
+// --- Админ-панель ---
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+// API для администратора
+app.get('/api/admin/users', auth, isAdmin, (req, res) => {
+    const users = DB.USERS.map(({ passwordHash, ...rest }) => rest);
+    res.json(users);
+});
+
+app.get('/api/admin/orders', auth, isAdmin, (req, res) => {
+    res.json(DB.ORDERS);
+});
+
+app.delete('/api/admin/users/:id', auth, isAdmin, (req, res) => {
+    const index = DB.USERS.findIndex(u => u.id === req.params.id);
+    if (index === -1) return res.status(404).json({ msg: 'User not found' });
+    DB.USERS.splice(index, 1);
+    fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
+    res.json({ success: true });
+});
+
+app.put('/api/admin/users/:id', auth, isAdmin, (req, res) => {
+    const user = DB.USERS.find(u => u.id === req.params.id);
+    if (!user) return res.status(404).json({ msg: 'User not found' });
+    Object.assign(user, req.body);
+    fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
+    res.json({ success: true });
+});
+
+// Промокоды (admin)
+app.get('/api/admin/promos', auth, isAdmin, (req, res) => {
+    res.json(DB.PROMOS || []);
+});
+
+app.post('/api/admin/promos', auth, isAdmin, (req, res) => {
+    const promo = { id: 'promo_' + Date.now(), ...req.body };
+    if (!DB.PROMOS) DB.PROMOS = [];
+    DB.PROMOS.push(promo);
+    fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
+    res.json(promo);
+});
+
+app.put('/api/admin/promos/:id', auth, isAdmin, (req, res) => {
+    const promo = DB.PROMOS.find(p => p.id === req.params.id);
+    if (!promo) return res.status(404).json({ msg: 'Promo not found' });
+    Object.assign(promo, req.body);
+    fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
+    res.json(promo);
+});
+
+app.delete('/api/admin/promos/:id', auth, isAdmin, (req, res) => {
+    DB.PROMOS = (DB.PROMOS || []).filter(p => p.id !== req.params.id);
+    fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
+    res.json({ success: true });
+});
+
+// Отзывы (admin)
+app.get('/api/admin/reviews', auth, isAdmin, (req, res) => {
+    res.json(DB.REVIEWS || []);
+});
+
+app.put('/api/admin/reviews/:id', auth, isAdmin, (req, res) => {
+    const review = DB.REVIEWS.find(r => r.id === req.params.id);
+    if (!review) return res.status(404).json({ msg: 'Review not found' });
+    Object.assign(review, req.body);
+    fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
+    res.json(review);
+});
+
+app.delete('/api/admin/reviews/:id', auth, isAdmin, (req, res) => {
+    DB.REVIEWS = (DB.REVIEWS || []).filter(r => r.id !== req.params.id);
+    fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
+    res.json({ success: true });
+});
+
+// Портфолио (admin)
+app.get('/api/admin/portfolio', auth, isAdmin, (req, res) => {
+    res.json(DB.PORTFOLIO || []);
+});
+
+app.delete('/api/admin/portfolio/:id', auth, isAdmin, (req, res) => {
+    DB.PORTFOLIO = (DB.PORTFOLIO || []).filter(p => p.id !== req.params.id);
+    fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
+    res.json({ success: true });
+});
+
+// Отправка уведомлений (admin)
+app.post('/api/admin/notify', auth, isAdmin, (req, res) => {
+    const { role, message } = req.body;
+    const users = DB.USERS.filter(u => u.role === role);
+    if (!DB.NOTIFICATIONS) DB.NOTIFICATIONS = [];
+    users.forEach(u => {
+        DB.NOTIFICATIONS.push({
+            id: 'notif_' + Date.now() + '_' + u.id,
+            userId: u.id,
+            type: 'admin',
+            data: { text: message },
+            read: false,
+            createdAt: new Date().toISOString()
+        });
+    });
+    fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
+    res.json({ success: true, count: users.length });
+});
+
+// --- Личный кабинет мастера ---
+app.get('/pro-dashboard', auth, isPro, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pro-dashboard.html'));
+});
+
+app.get('/api/pro/stats', auth, isPro, (req, res) => {
+    const proId = req.user.id;
+    const pro = DB.USERS.find(u => u.id === proId);
+    const orders = DB.ORDERS.filter(o => o.proId === proId);
+    const completed = orders.filter(o => o.status === 'Выполнен').length;
+    const totalEarned = orders.reduce((sum, o) => sum + (o.price || 0), 0);
+    res.json({
+        name: pro.name,
+        rating: pro.rating,
+        ratingCount: pro.ratingCount,
+        completedJobs: pro.completedJobs || 0,
+        totalOrders: orders.length,
+        completed,
+        totalEarned
+    });
+});
+
+app.get('/api/pro/orders', auth, isPro, (req, res) => {
+    const orders = DB.ORDERS.filter(o => o.proId === req.user.id);
+    res.json(orders);
+});
+
+app.put('/api/pro/profile', auth, isPro, (req, res) => {
+    const pro = DB.USERS.find(u => u.id === req.user.id);
+    if (!pro) return res.status(404).json({ msg: 'Not found' });
+    const { name, phone, desc, price, category } = req.body;
+    if (name) pro.name = name;
+    if (phone) pro.phone = phone;
+    if (desc) pro.desc = desc;
+    if (price) pro.price = price;
+    if (category) pro.category = category;
+    fs.writeFileSync(DATA_FILE, JSON.stringify(DB));
+    res.json({ success: true });
 });
 
 // --- Отправка HTML-страницы ---

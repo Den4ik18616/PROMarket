@@ -1,4 +1,4 @@
-// client.js – финальная версия с исправлением фильтров на мобильных
+// client.js – финальная версия с исправленным профилем (кнопка "Выйти")
 
 // ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
 let map, markersLayer;
@@ -11,6 +11,7 @@ let ws = null;
 let pros = [];
 let userLocation = null;
 let currentRatingComplete = 0;
+let selectedForCompare = JSON.parse(localStorage.getItem('compare') || '[]');
 
 const cancelReasons = [
     'Передумал',
@@ -32,7 +33,7 @@ if (navigator.geolocation) {
 particlesJS('particles-js', {
     particles: {
         number: { value: 30, density: { enable: true, value_area: 800 } },
-        color: { value: '#4f46e5' },
+        color: { value: '#8b5cf6' },
         shape: { type: 'circle' },
         opacity: { value: 0.3, random: true },
         size: { value: 3, random: true },
@@ -45,11 +46,11 @@ particlesJS('particles-js', {
     }
 });
 
-// ==================== LEAFLET КАРТА (спутник) ====================
+// ==================== LEAFLET КАРТА ====================
 function initMap() {
     map = L.map('map').setView([55.75, 37.61], 10);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles © Esri',
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '',
         maxZoom: 19
     }).addTo(map);
 
@@ -151,6 +152,19 @@ function toggleFav(id, el) {
     }
 }
 
+// ==================== СРАВНЕНИЕ ====================
+function toggleCompare(id, el) {
+    const index = selectedForCompare.indexOf(id);
+    if (index === -1) {
+        selectedForCompare.push(id);
+        if (el) el.classList.add('active');
+    } else {
+        selectedForCompare.splice(index, 1);
+        if (el) el.classList.remove('active');
+    }
+    localStorage.setItem('compare', JSON.stringify(selectedForCompare));
+}
+
 // ==================== МОДАЛЬНЫЕ ОКНА ====================
 function openModal(id) {
     document.getElementById(id).style.display = 'flex';
@@ -162,15 +176,101 @@ function closeModal(id) {
 // ==================== АВТОРИЗАЦИЯ ====================
 function handleAuthAction() {
     if (token) {
-        if (confirm('Выйти из аккаунта?')) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('uname');
-            location.reload();
-        }
+        openProfile();
     } else {
         openModal('modal-auth');
     }
-    updateMenuAuthText();
+}
+
+// ==================== ПРОФИЛЬ (исправлен: только кнопки Выйти / Закрыть) ====================
+function openProfile() {
+    const name = localStorage.getItem('uname') || '';
+    const email = localStorage.getItem('email') || 'не указан';
+    const role = localStorage.getItem('role') || 'client';
+    const regDate = localStorage.getItem('regDate') || new Date().toLocaleDateString();
+    const favsCount = favorites.length;
+    const avatarInitial = name.charAt(0).toUpperCase() || 'U';
+
+    // Формируем HTML для профиля
+    const statsHtml = `
+        <div class="profile-stats">
+            <div class="stat-box">
+                <div class="value">${favsCount}</div>
+                <div class="label">Избранное</div>
+            </div>
+            <div class="stat-box" id="profile-orders-stat">
+                <div class="value">0</div>
+                <div class="label">Заказы</div>
+            </div>
+            <div class="stat-box">
+                <div class="value">${localStorage.getItem('reviewsCount') || '0'}</div>
+                <div class="label">Отзывы</div>
+            </div>
+        </div>
+    `;
+
+    const profileHtml = `
+        <div class="profile-avatar" id="profile-avatar">${avatarInitial}</div>
+        ${statsHtml}
+        <div class="profile-detail">
+            <i class="fas fa-user"></i>
+            <strong>Имя:</strong> <span id="profile-name">${name}</span>
+        </div>
+        <div class="profile-detail">
+            <i class="fas fa-envelope"></i>
+            <strong>Email:</strong> <span id="profile-email">${email}</span>
+        </div>
+        <div class="profile-detail">
+            <i class="fas fa-tag"></i>
+            <strong>Роль:</strong> <span id="profile-role">${role}</span>
+        </div>
+        <div class="profile-detail">
+            <i class="fas fa-calendar-alt"></i>
+            <strong>Регистрация:</strong> <span id="profile-reg">${regDate}</span>
+        </div>
+        <div class="profile-detail">
+            <i class="fas fa-heart"></i>
+            <strong>Избранное:</strong> <span id="profile-favs">${favsCount}</span>
+        </div>
+        <div class="profile-detail">
+            <i class="fas fa-shopping-bag"></i>
+            <strong>Заказов:</strong> <span id="profile-orders">0</span>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+            <button class="btn btn-danger" onclick="logout()">Выйти</button>
+            <button class="btn btn-outline" onclick="closeModal('modal-profile')">Закрыть</button>
+        </div>
+    `;
+
+    // Вставляем содержимое в контейнер
+    const profileInfo = document.getElementById('profile-info');
+    if (profileInfo) {
+        profileInfo.innerHTML = profileHtml;
+    }
+
+    // Загружаем количество заказов
+    fetch('/api/my-orders', { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(res => res.json())
+        .then(orders => {
+            const ordersCount = orders.length;
+            document.getElementById('profile-orders').innerText = ordersCount;
+            const ordersStat = document.getElementById('profile-orders-stat');
+            if (ordersStat) ordersStat.querySelector('.value').innerText = ordersCount;
+        })
+        .catch(() => {
+            document.getElementById('profile-orders').innerText = '0';
+            const ordersStat = document.getElementById('profile-orders-stat');
+            if (ordersStat) ordersStat.querySelector('.value').innerText = '0';
+        });
+
+    openModal('modal-profile');
+}
+
+function logout() {
+    if (confirm('Выйти из аккаунта?')) {
+        localStorage.clear();
+        location.reload();
+    }
 }
 
 // ==================== ВХОД / РЕГИСТРАЦИЯ ====================
@@ -188,6 +288,8 @@ async function doLogin() {
         localStorage.setItem('uname', data.user.name);
         localStorage.setItem('userId', data.user.id);
         localStorage.setItem('role', data.user.role);
+        localStorage.setItem('email', data.user.email);
+        localStorage.setItem('regDate', new Date().toLocaleDateString()); // имитация даты регистрации
         location.reload();
     } else {
         showToast('Ошибка входа', 'error');
@@ -268,35 +370,41 @@ async function getPros() {
         pros.forEach((p, idx) => {
             const isFav = favorites.includes(p.id);
             const verifiedBadge = p.verified ? '<i class="fas fa-check-circle verified-badge" title="Проверенный мастер"></i>' : '';
+            const isSelected = selectedForCompare.includes(p.id);
 
             let distanceHtml = '';
             if (userLocation) {
                 const from = L.latLng(userLocation.lat, userLocation.lng);
                 const to = L.latLng(p.location.lat, p.location.lng);
                 const distKm = from.distanceTo(to) / 1000;
-                distanceHtml = '<div style="font-size:0.8rem; color:var(--text-muted); margin-top:5px">🚗 ' + distKm.toFixed(1) + ' км</div>';
+                distanceHtml = '<div class="distanceHtml" style="font-size:0.8rem; color:var(--text-muted); margin-top:5px">🚗 ' + distKm.toFixed(1) + ' км</div>';
             }
 
             const card = document.createElement('div');
             card.className = 'card';
             card.style.animationDelay = idx * 0.05 + 's';
 
+            const avatar = '<div class="avatar">' + p.name.charAt(0) + '</div>';
+            const safeName = p.name.replace(/'/g, "\\'");
+
             let html = '<div class="card-header">' +
-                '<input type="checkbox" class="compare-checkbox" data-id="' + p.id + '" title="Выбрать для сравнения">' +
+                avatar +
                 '<span class="category-tag"><i class="fas ' + p.icon + '"></i> ' + p.category + '</span>' +
-                '<div style="display:flex; gap:10px;">' +
+                '<div style="display:flex; gap:5px;">' +
+                '<input type="checkbox" class="compare-checkbox" data-id="' + p.id + '" ' + (isSelected ? 'checked' : '') + ' onchange="toggleCompare(\'' + p.id + '\', this)" title="Выбрать для сравнения">' +
                 '<i class="fa' + (isFav ? 's' : 'r') + ' fa-heart fav-btn ' + (isFav ? 'active' : '') + '" onclick="toggleFav(\'' + p.id + '\', this)" title="' + (isFav ? 'Убрать из избранного' : 'Добавить в избранное') + '"></i>' +
-                '<i class="fas fa-share-alt" onclick="sharePro(\'' + p.id + '\', \'' + p.name + '\')" style="cursor:pointer; color:var(--text-muted);" title="Поделиться"></i>' +
+                '<i class="fas fa-share-alt" onclick="sharePro(\'' + p.id + '\', \'' + safeName + '\')" style="cursor:pointer; color:var(--text-muted);" title="Поделиться"></i>' +
                 '<i class="fas fa-compass compass-icon" onclick="centerMap(' + p.location.lat + ', ' + p.location.lng + ')" title="Показать на карте"></i>' +
                 '</div>' +
                 '</div>' +
-                '<h3 style="margin:0 0 5px 0">' + p.name + ' ' + verifiedBadge + '</h3>' +
+                '<h3 style="margin:0 0 5px 0; cursor: pointer;" onclick="showMasterProfile(\'' + p.id + '\')">' + p.name + ' ' + verifiedBadge + '</h3>' +
                 '<div style="font-size:0.85rem; color:#f59e0b; font-weight:bold"><i class="fas fa-star"></i> ' + p.rating + ' <span style="color:#94a3b8; font-weight:400">(' + p.ratingCount + ' отзывов)</span></div>' +
                 '<p style="font-size:0.85rem; color:var(--text-muted); margin:15px 0">' + p.desc + '</p>' +
                 distanceHtml +
                 '<div class="price">' + p.price + ' <span>₽/час</span></div>' +
-                '<button class="btn btn-primary" onclick="openBooking(\'' + p.id + '\', \'' + p.name + '\', ' + p.price + ')">Заказать услугу</button>' +
-                '<button class="btn btn-outline" style="margin-top:10px" onclick="showToast(\'Чат с мастером в разработке\', \'info\')" title="Пока в разработке">Чат с мастером</button>';
+                '<button class="btn btn-primary" onclick="openBooking(\'' + p.id + '\', \'' + safeName + '\', ' + p.price + ')">Заказать услугу</button>' +
+                '<button class="btn btn-outline" style="margin-top:10px" onclick="showToast(\'Чат с мастером в разработке\', \'info\')" title="Пока в разработке">Чат с мастером</button>' +
+                '<button class="btn btn-outline btn-sm" style="margin-top:5px;" onclick="openComplaintModal(\'pro\', \'' + p.id + '\')"><i class="fas fa-flag"></i> Пожаловаться</button>';
 
             card.innerHTML = html;
             list.appendChild(card);
@@ -307,6 +415,103 @@ async function getPros() {
     document.querySelectorAll('.card').forEach((card, i) => animateCardIn(card, i * 0.05));
 
     if (loader) loader.classList.add('hidden');
+    showRecommendations();
+}
+
+// ==================== ПРОФИЛЬ МАСТЕРА ====================
+function showMasterProfile(proId) {
+    const master = pros.find(p => p.id === proId);
+    if (!master) return;
+    localStorage.setItem('lastCategory', master.category);
+    const isAdmin = localStorage.getItem('role') === 'admin';
+    let html = `
+        <div style="text-align: center;">
+            <div class="avatar" style="width:80px; height:80px; font-size:2rem; margin:0 auto 15px;">${master.name.charAt(0)}</div>
+            <h3>${master.name}</h3>
+            <p>${master.category}</p>
+        </div>
+        <div style="margin-top:20px;">
+            <p><i class="fas fa-star" style="color:gold;"></i> Рейтинг: ${master.rating} (${master.ratingCount} отзывов)</p>
+            <p><i class="fas fa-check-circle" style="color:var(--success);"></i> Верифицирован: ${master.verified ? 'Да' : 'Нет'}</p>
+            <p><i class="fas fa-briefcase"></i> Выполнено заказов: ${master.completedJobs || 0}</p>
+            <p>${master.desc}</p>
+        </div>
+    `;
+    fetch('/api/portfolio/' + proId)
+        .then(res => res.json())
+        .then(portfolio => {
+            if (portfolio.length > 0) {
+                html += '<h4>Портфолио</h4><div style="display:flex; flex-wrap:wrap; gap:10px;">';
+                portfolio.forEach(item => {
+                    html += `<div class="portfolio-item">${item.photos.map(p => `<img src="/uploads/${p}" style="width:80px; height:80px; object-fit:cover; border-radius:8px;">`).join('')}<br>${item.title}</div>`;
+                });
+                html += '</div>';
+            }
+            document.getElementById('master-profile-content').innerHTML = html;
+        });
+    if (isAdmin) {
+        html += `
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+                <button class="btn btn-warning" onclick="adminAction('verify', '${master.id}')">Верифицировать</button>
+                <button class="btn btn-danger" onclick="adminAction('block', '${master.id}')">Заблокировать</button>
+            </div>
+        `;
+    }
+    html += `<button class="btn btn-outline" style="margin-top:10px;" onclick="openComplaintModal('pro', '${master.id}')"><i class="fas fa-flag"></i> Пожаловаться</button>`;
+    document.getElementById('master-profile-content').innerHTML = html;
+    openModal('modal-master-profile');
+}
+
+// ==================== ЖАЛОБЫ ====================
+let currentComplaintTarget = null;
+function openComplaintModal(targetType, targetId) {
+    if (!token) { openModal('modal-auth'); return; }
+    currentComplaintTarget = { targetType, targetId };
+    document.getElementById('complaint-reason').value = 'spam';
+    document.getElementById('complaint-desc').value = '';
+    openModal('modal-complaint');
+}
+
+async function submitComplaint() {
+    const reason = document.getElementById('complaint-reason').value;
+    const description = document.getElementById('complaint-desc').value;
+    if (!reason) { showToast('Выберите причину', 'error'); return; }
+    const res = await fetch('/api/complaints', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({
+            targetType: currentComplaintTarget.targetType,
+            targetId: currentComplaintTarget.targetId,
+            reason,
+            description
+        })
+    });
+    if (res.ok) {
+        showToast('Жалоба отправлена', 'success');
+        closeModal('modal-complaint');
+    } else {
+        const err = await res.json();
+        showToast(err.msg || 'Ошибка', 'error');
+    }
+}
+
+// ==================== РЕКОМЕНДАЦИИ ====================
+function showRecommendations() {
+    const lastCategory = localStorage.getItem('lastCategory');
+    if (!lastCategory || pros.length === 0) return;
+    const recommended = pros.filter(p => p.category === lastCategory && p.id !== currentPro?.id).slice(0, 3);
+    if (recommended.length === 0) return;
+    let html = '<div class="recommendations" style="margin-top:30px;"><h3>Вам может понравиться</h3><div class="grid">';
+    recommended.forEach(p => {
+        html += `<div class="card" style="padding:12px; cursor:pointer;" onclick="showMasterProfile('${p.id}')">
+            <div class="avatar">${p.name.charAt(0)}</div>
+            <h4>${p.name}</h4>
+            <p>${p.category}</p>
+            <p>⭐ ${p.rating}</p>
+        </div>`;
+    });
+    html += '</div></div>';
+    document.getElementById('pros-list').insertAdjacentHTML('beforeend', html);
 }
 
 // ==================== ЦЕНТРИРОВАНИЕ КАРТЫ ====================
@@ -438,6 +643,7 @@ async function getOrders() {
             if (o.status === 'В процессе') {
                 actions = '<button class="btn btn-outline" style="width:100%; margin-top:10px" onclick="openCompleteModal(\'' + o.id + '\')">Завершить</button>';
             }
+            // Кнопка "Скачать квитанцию" для выполненных заказов удалена по требованию
 
             let statusColor = '';
             if (o.status === 'Выполнен') {
@@ -480,17 +686,43 @@ async function fetchNotifications() {
         if (!res.ok) throw new Error('Ошибка загрузки');
         const notifs = await res.json();
         const count = notifs.length;
-        const badge = document.getElementById('notificationCount');
-        if (count > 0) {
-            badge.classList.remove('hidden');
-            badge.innerText = count;
-            if (count > lastNotifCount) {
-                const bell = document.getElementById('notificationBell').querySelector('i');
+        
+        const bellBadge = document.getElementById('notificationCount');
+        if (bellBadge) {
+            if (count > 0) {
+                bellBadge.classList.remove('hidden');
+                bellBadge.innerText = count;
+            } else {
+                bellBadge.classList.add('hidden');
+            }
+        }
+
+        const hamburgerBadge = document.getElementById('hamburger-notif-count');
+        if (hamburgerBadge) {
+            if (count > 0) {
+                hamburgerBadge.classList.remove('hidden');
+                hamburgerBadge.innerText = count;
+            } else {
+                hamburgerBadge.classList.add('hidden');
+            }
+        }
+
+        const menuBadge = document.getElementById('menu-notif-count');
+        if (menuBadge) {
+            if (count > 0) {
+                menuBadge.classList.remove('hidden');
+                menuBadge.innerText = count;
+            } else {
+                menuBadge.classList.add('hidden');
+            }
+        }
+
+        if (count > lastNotifCount) {
+            const bell = document.getElementById('notificationBell')?.querySelector('i');
+            if (bell) {
                 bell.style.animation = 'bell-shake 0.5s';
                 setTimeout(() => bell.style.animation = '', 500);
             }
-        } else {
-            badge.classList.add('hidden');
         }
         lastNotifCount = count;
         return notifs;
@@ -609,7 +841,7 @@ function sendMessage() {
     input.value = '';
 }
 
-// ==================== ЗАВЕРШЕНИЕ ЗАКАЗА ====================
+// ==================== ЗАВЕРШЕНИЕ ЗАКАЗА (без фото) ====================
 function openCompleteModal(orderId) {
     currentOrderId = orderId;
     const modal = document.createElement('div');
@@ -713,7 +945,6 @@ function toggleHamburgerMenu() {
 }
 document.getElementById('menu-toggle').onclick = toggleHamburgerMenu;
 
-// Закрытие меню при клике вне его
 document.addEventListener('click', (e) => {
     const menu = document.getElementById('hamburger-menu');
     const btn = document.getElementById('menu-toggle');
@@ -722,16 +953,15 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Обновление текста в меню в зависимости от состояния
 function updateMenuAuthText() {
     const authItem = document.querySelector('#menu-auth-text');
     if (authItem) {
-        authItem.innerText = token ? 'Выйти' : 'Войти';
+        authItem.innerText = token ? 'Профиль' : 'Войти';
     }
 }
 updateMenuAuthText();
 
-// Тёмная тема (переключение)
+// ==================== ТЁМНАЯ ТЕМА ====================
 function toggleTheme() {
     const isDark = document.body.hasAttribute('data-theme');
     if (isDark) {
@@ -821,13 +1051,21 @@ function showAbout() {
 document.getElementById('compare-btn').onclick = compareMasters;
 
 function compareMasters() {
-    const checkboxes = document.querySelectorAll('.compare-checkbox:checked');
-    const selectedIds = Array.from(checkboxes).map(cb => cb.dataset.id);
-    if (selectedIds.length < 2) {
+    const isMobile = document.documentElement.classList.contains('mobile');
+    let selectedMasters = [];
+
+    if (isMobile) {
+        selectedMasters = pros.filter(p => selectedForCompare.includes(p.id));
+    } else {
+        const checkboxes = document.querySelectorAll('.compare-checkbox:checked');
+        const selectedIds = Array.from(checkboxes).map(cb => cb.dataset.id);
+        selectedMasters = pros.filter(p => selectedIds.includes(p.id));
+    }
+
+    if (selectedMasters.length < 2) {
         showToast('Выберите хотя бы двух мастеров для сравнения', 'error');
         return;
     }
-    const selectedMasters = pros.filter(p => selectedIds.includes(p.id));
     showCompareModal(selectedMasters);
 }
 
@@ -841,9 +1079,9 @@ function showCompareModal(masters) {
         { label: 'Описание', key: 'desc' },
         { label: 'Проверенный', key: 'verified', format: v => v ? 'Да' : 'Нет' }
     ];
-    let html = '<table class="compare-table"><tr><th>Параметр</th>';
+    let html = '<table class="compare-table">如果你<th>Параметр</th>';
     masters.forEach(m => html += '<th>' + m.name + '</th>');
-    html += '</tr>';
+    html += '<tr>';
     fields.forEach(f => {
         html += '<tr><td>' + f.label + '</td>';
         masters.forEach(m => {
@@ -873,23 +1111,19 @@ window.addEventListener('scroll', () => {
 });
 document.getElementById('scrollTop').onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-// ==================== УПРАВЛЕНИЕ САЙДБАРОМ НА МОБИЛЬНЫХ ====================
-// Функция для открытия/закрытия сайдбара (используется в гамбургер-меню)
+// ==================== УПРАВЛЕНИЕ САЙДБАРОМ ====================
 function toggleSidebar() {
     document.querySelector('.sidebar').classList.toggle('open');
 }
-
 document.getElementById('filter-toggle').onclick = toggleSidebar;
 document.getElementById('sidebar-close').onclick = () => {
     document.querySelector('.sidebar').classList.remove('open');
 };
 
-// Закрытие сайдбара при клике вне его (но не внутри гамбургер-меню)
 document.addEventListener('click', (e) => {
     const sidebar = document.querySelector('.sidebar');
     const filterBtn = document.getElementById('filter-toggle');
     const hamburgerMenu = document.getElementById('hamburger-menu');
-    // Если клик был внутри гамбургер-меню, не закрываем сайдбар
     if (hamburgerMenu && hamburgerMenu.contains(e.target)) {
         return;
     }
@@ -897,6 +1131,37 @@ document.addEventListener('click', (e) => {
         sidebar.classList.remove('open');
     }
 });
+
+// ==================== СВАЙП ДЛЯ ЗАКРЫТИЯ САЙДБАРА ====================
+let touchstartX = 0;
+let touchendX = 0;
+const sidebarEl = document.querySelector('.sidebar');
+if (sidebarEl) {
+    sidebarEl.addEventListener('touchstart', e => {
+        touchstartX = e.changedTouches[0].screenX;
+    });
+    sidebarEl.addEventListener('touchend', e => {
+        touchendX = e.changedTouches[0].screenX;
+        if (touchendX < touchstartX - 50) {
+            sidebarEl.classList.remove('open');
+        }
+    });
+}
+
+// ==================== ИНДИКАТОР ПРОКРУТКИ ====================
+const prosList = document.getElementById('pros-list');
+if (prosList) {
+    prosList.addEventListener('scroll', () => {
+        const scrollPercent = (prosList.scrollTop / (prosList.scrollHeight - prosList.clientHeight)) * 100;
+        document.getElementById('scroll-indicator').style.width = scrollPercent + '%';
+    });
+}
+
+// ==================== АДМИН-ПАНЕЛЬ ====================
+if (token && localStorage.getItem('role') === 'admin') {
+    const adminItem = document.getElementById('admin-menu-item');
+    if (adminItem) adminItem.classList.remove('hidden');
+}
 
 // ==================== ИНИЦИАЛИЗАЦИЯ ====================
 if (token) {

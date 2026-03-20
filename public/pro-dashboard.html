@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>PROMarket — Кабинет мастера</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: linear-gradient(145deg, #0a0a0f 0%, #1a1a2e 100%);
+            color: #e0e0ff;
+            font-family: 'Inter', sans-serif;
+            padding: 40px;
+            min-height: 100vh;
+        }
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 30px; background: linear-gradient(135deg, #9f7aea, #b794f4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: rgba(26,26,46,0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid rgba(159,122,234,0.3);
+        }
+        .stat-value { font-size: 2rem; font-weight: 800; color: white; }
+        .stat-label { color: #a0a0c0; }
+        .section {
+            background: rgba(26,26,46,0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        h2 { margin-bottom: 20px; color: white; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #a0a0c0; }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(10,10,15,0.6);
+            border: 1px solid rgba(159,122,234,0.3);
+            border-radius: 12px;
+            color: #e0e0ff;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #9f7aea, #b794f4);
+            color: white;
+        }
+        .btn-secondary { background: rgba(26,26,46,0.8); border: 1px solid rgba(159,122,234,0.3); }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 10px; background: rgba(159,122,234,0.2); }
+        td { padding: 10px; border-bottom: 1px solid rgba(159,122,234,0.1); }
+        .portfolio-item {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        .portfolio-item img { width: 100px; height: 100px; object-fit: cover; border-radius: 12px; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1><i class="fas fa-user-cog"></i> Личный кабинет мастера</h1>
+        
+        <div class="stats-grid" id="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-orders">0</div>
+                <div class="stat-label">Заказов</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-completed">0</div>
+                <div class="stat-label">Выполнено</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-rating">0.0</div>
+                <div class="stat-label">Рейтинг</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-earned">0</div>
+                <div class="stat-label">Заработано ₽</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><i class="fas fa-edit"></i> Редактировать профиль</h2>
+            <form id="profile-form">
+                <div class="form-group">
+                    <label>Имя</label>
+                    <input type="text" id="pro-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Телефон</label>
+                    <input type="text" id="pro-phone">
+                </div>
+                <div class="form-group">
+                    <label>Описание</label>
+                    <textarea id="pro-desc" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Цена (₽/час)</label>
+                    <input type="number" id="pro-price">
+                </div>
+                <div class="form-group">
+                    <label>Категория</label>
+                    <select id="pro-cat">
+                        <option value="Ремонт">Ремонт</option>
+                        <option value="Уборка">Уборка</option>
+                        <option value="IT">IT</option>
+                        <option value="Красота">Красота</option>
+                        <option value="Переезды">Переезды</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Сохранить изменения</button>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2><i class="fas fa-images"></i> Портфолио</h2>
+            <form id="portfolio-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Название работы</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label>Описание</label>
+                    <textarea name="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Фотографии (до 10)</label>
+                    <input type="file" name="photos" multiple accept="image/*">
+                </div>
+                <button type="submit" class="btn">Добавить</button>
+            </form>
+            <div id="portfolio-list" style="margin-top:30px; display:flex; flex-wrap:wrap;"></div>
+        </div>
+
+        <div class="section">
+            <h2><i class="fas fa-truck"></i> Мои заказы</h2>
+            <table id="orders-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Клиент</th>
+                        <th>Дата</th>
+                        <th>Цена</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <a href="/" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> На главную</a>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Требуется авторизация');
+            location.href = '/';
+        }
+
+        // --- Загрузка статистики и заказов ---
+        async function loadStats() {
+            const res = await fetch('/api/pro/stats', { headers: { 'Authorization': 'Bearer ' + token } });
+            const stats = await res.json();
+            document.getElementById('stat-orders').innerText = stats.totalOrders || 0;
+            document.getElementById('stat-completed').innerText = stats.completedJobs || 0;
+            document.getElementById('stat-rating').innerText = stats.rating ? stats.rating.toFixed(1) : '0.0';
+            document.getElementById('stat-earned').innerText = stats.totalEarned || 0;
+            document.getElementById('pro-name').value = stats.name || '';
+            // остальные поля заполним отдельно
+        }
+
+        async function loadProfile() {
+            const res = await fetch('/api/pro/stats', { headers: { 'Authorization': 'Bearer ' + token } }); // используем тот же, можно расширить
+            const data = await res.json();
+            // пока нет отдельного API, пропускаем
+        }
+
+        async function loadOrders() {
+            const res = await fetch('/api/pro/orders', { headers: { 'Authorization': 'Bearer ' + token } });
+            const orders = await res.json();
+            const tbody = document.querySelector('#orders-table tbody');
+            tbody.innerHTML = orders.reverse().map(o => `
+                <tr>
+                    <td>${o.id}</td>
+                    <td>${o.clientId}</td>
+                    <td>${new Date(o.createdAt).toLocaleDateString()}</td>
+                    <td>${o.price} ₽</td>
+                    <td>${o.status}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadPortfolio() {
+            const res = await fetch('/api/portfolio/' + localStorage.getItem('userId'), { headers: { 'Authorization': 'Bearer ' + token } });
+            const portfolio = await res.json();
+            const container = document.getElementById('portfolio-list');
+            container.innerHTML = portfolio.map(item => `
+                <div class="portfolio-item">
+                    ${item.photos.map(photo => `<img src="/uploads/${photo}" alt="">`).join('')}
+                    <div>${item.title}</div>
+                    <button onclick="deletePortfolio('${item.id}')">Удалить</button>
+                </div>
+            `).join('');
+        }
+
+        async function deletePortfolio(id) {
+            if (!confirm('Удалить?')) return;
+            await fetch('/api/portfolio/' + id, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+            loadPortfolio();
+        }
+
+        // --- Обновление профиля ---
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('pro-name').value,
+                phone: document.getElementById('pro-phone').value,
+                desc: document.getElementById('pro-desc').value,
+                price: parseInt(document.getElementById('pro-price').value),
+                category: document.getElementById('pro-cat').value
+            };
+            const res = await fetch('/api/pro/profile', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) alert('Сохранено');
+        });
+
+        // --- Добавление портфолио ---
+        document.getElementById('portfolio-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const res = await fetch('/api/portfolio', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token },
+                body: formData
+            });
+            if (res.ok) {
+                alert('Добавлено');
+                e.target.reset();
+                loadPortfolio();
+            }
+        });
+
+        loadStats();
+        loadOrders();
+        loadPortfolio();
+    </script>
+</body>
+</html>

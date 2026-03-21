@@ -1,6 +1,6 @@
-// client.js – финальная версия с исправленным профилем (кнопка "Выйти")
+// client.js – финальная версия с мобильной адаптацией (карточки-превью)
+// Добавлен обработчик resize, клик по карточке открывает детали
 
-// ==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================
 let map, markersLayer;
 let token = localStorage.getItem('token');
 let currentPro = null;
@@ -21,7 +21,6 @@ const cancelReasons = [
     'Другое'
 ];
 
-// ==================== ГЕОЛОКАЦИЯ ====================
 if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(pos => {
         userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
@@ -29,7 +28,6 @@ if (navigator.geolocation) {
     }, err => console.log('Геолокация не доступна', err));
 }
 
-// ==================== ЧАСТИЦЫ ====================
 particlesJS('particles-js', {
     particles: {
         number: { value: 30, density: { enable: true, value_area: 800 } },
@@ -46,14 +44,12 @@ particlesJS('particles-js', {
     }
 });
 
-// ==================== LEAFLET КАРТА ====================
 function initMap() {
     map = L.map('map').setView([55.75, 37.61], 10);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '',
         maxZoom: 19
     }).addTo(map);
-
     markersLayer = L.markerClusterGroup({
         disableClusteringAtZoom: 15,
         spiderfyOnMaxZoom: true,
@@ -79,7 +75,6 @@ function addMarkersToMap(pros) {
     });
 }
 
-// ==================== GSAP АНИМАЦИИ ====================
 function animateCardIn(card, delay = 0) {
     gsap.fromTo(card,
         { opacity: 0, y: 20 },
@@ -95,7 +90,6 @@ function animateViewChange(oldView, newView) {
     }});
 }
 
-// ==================== ПАРАЛЛАКС ====================
 window.addEventListener('scroll', () => {
     const mapEl = document.getElementById('map');
     if (mapEl) {
@@ -103,7 +97,6 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// ==================== МАСКОТ ====================
 function showMascot(message) {
     const mascot = document.createElement('div');
     mascot.className = 'mascot';
@@ -112,7 +105,6 @@ function showMascot(message) {
     setTimeout(() => mascot.remove(), 3000);
 }
 
-// ==================== ВСПОМОГАТЕЛЬНЫЕ ====================
 function debounce(func, wait) {
     let timeout;
     return function () {
@@ -129,7 +121,6 @@ function showToast(text, type = 'info') {
     setTimeout(() => t.remove(), 3000);
 }
 
-// ==================== ИЗБРАННОЕ ====================
 function toggleFav(id, el) {
     if (favorites.includes(id)) {
         if (!confirm('Убрать из избранного?')) return;
@@ -139,7 +130,6 @@ function toggleFav(id, el) {
     }
     localStorage.setItem('favs', JSON.stringify(favorites));
     getPros();
-
     if (token) {
         fetch('/api/favorites/' + id, {
             method: 'POST',
@@ -152,7 +142,6 @@ function toggleFav(id, el) {
     }
 }
 
-// ==================== СРАВНЕНИЕ ====================
 function toggleCompare(id, el) {
     const index = selectedForCompare.indexOf(id);
     if (index === -1) {
@@ -165,7 +154,6 @@ function toggleCompare(id, el) {
     localStorage.setItem('compare', JSON.stringify(selectedForCompare));
 }
 
-// ==================== МОДАЛЬНЫЕ ОКНА ====================
 function openModal(id) {
     document.getElementById(id).style.display = 'flex';
 }
@@ -173,7 +161,6 @@ function closeModal(id) {
     document.getElementById(id).style.display = 'none';
 }
 
-// ==================== АВТОРИЗАЦИЯ ====================
 function handleAuthAction() {
     if (token) {
         openProfile();
@@ -182,7 +169,6 @@ function handleAuthAction() {
     }
 }
 
-// ==================== ПРОФИЛЬ (исправлен: только кнопки Выйти / Закрыть) ====================
 function openProfile() {
     const name = localStorage.getItem('uname') || '';
     const email = localStorage.getItem('email') || 'не указан';
@@ -191,7 +177,6 @@ function openProfile() {
     const favsCount = favorites.length;
     const avatarInitial = name.charAt(0).toUpperCase() || 'U';
 
-    // Формируем HTML для профиля
     const statsHtml = `
         <div class="profile-stats">
             <div class="stat-box">
@@ -242,13 +227,11 @@ function openProfile() {
         </div>
     `;
 
-    // Вставляем содержимое в контейнер
     const profileInfo = document.getElementById('profile-info');
     if (profileInfo) {
         profileInfo.innerHTML = profileHtml;
     }
 
-    // Загружаем количество заказов
     fetch('/api/my-orders', { headers: { 'Authorization': 'Bearer ' + token } })
         .then(res => res.json())
         .then(orders => {
@@ -273,7 +256,6 @@ function logout() {
     }
 }
 
-// ==================== ВХОД / РЕГИСТРАЦИЯ ====================
 async function doLogin() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-pass').value;
@@ -289,14 +271,13 @@ async function doLogin() {
         localStorage.setItem('userId', data.user.id);
         localStorage.setItem('role', data.user.role);
         localStorage.setItem('email', data.user.email);
-        localStorage.setItem('regDate', new Date().toLocaleDateString()); // имитация даты регистрации
+        localStorage.setItem('regDate', new Date().toLocaleDateString());
         location.reload();
     } else {
         showToast('Ошибка входа', 'error');
     }
 }
 
-// ==================== ФИЛЬТРЫ ====================
 function resetFilters() {
     document.getElementById('f-cat').value = '';
     document.getElementById('f-price').value = '';
@@ -308,7 +289,6 @@ function resetFilters() {
     getPros();
 }
 
-// ==================== ПОЛУЧЕНИЕ МАСТЕРОВ ====================
 async function getPros() {
     const loader = document.getElementById('pros-loader');
     if (loader) loader.classList.remove('hidden');
@@ -363,6 +343,8 @@ async function getPros() {
 
     list.innerHTML = '';
 
+    const isMobile = document.documentElement.classList.contains('mobile');
+
     if (pros.length === 0) {
         list.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:50px; color:#94a3b8;"><i class="fas fa-search fa-3x"></i><p>Никого не нашли...</p></div>';
         showMascot('Попробуйте изменить фильтры');
@@ -371,42 +353,75 @@ async function getPros() {
             const isFav = favorites.includes(p.id);
             const verifiedBadge = p.verified ? '<i class="fas fa-check-circle verified-badge" title="Проверенный мастер"></i>' : '';
             const isSelected = selectedForCompare.includes(p.id);
-
-            let distanceHtml = '';
-            if (userLocation) {
-                const from = L.latLng(userLocation.lat, userLocation.lng);
-                const to = L.latLng(p.location.lat, p.location.lng);
-                const distKm = from.distanceTo(to) / 1000;
-                distanceHtml = '<div class="distanceHtml" style="font-size:0.8rem; color:var(--text-muted); margin-top:5px">🚗 ' + distKm.toFixed(1) + ' км</div>';
-            }
-
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.style.animationDelay = idx * 0.05 + 's';
-
             const avatar = '<div class="avatar">' + p.name.charAt(0) + '</div>';
             const safeName = p.name.replace(/'/g, "\\'");
 
-            let html = '<div class="card-header">' +
-                avatar +
-                '<span class="category-tag"><i class="fas ' + p.icon + '"></i> ' + p.category + '</span>' +
-                '<div style="display:flex; gap:5px;">' +
-                '<input type="checkbox" class="compare-checkbox" data-id="' + p.id + '" ' + (isSelected ? 'checked' : '') + ' onchange="toggleCompare(\'' + p.id + '\', this)" title="Выбрать для сравнения">' +
-                '<i class="fa' + (isFav ? 's' : 'r') + ' fa-heart fav-btn ' + (isFav ? 'active' : '') + '" onclick="toggleFav(\'' + p.id + '\', this)" title="' + (isFav ? 'Убрать из избранного' : 'Добавить в избранное') + '"></i>' +
-                '<i class="fas fa-share-alt" onclick="sharePro(\'' + p.id + '\', \'' + safeName + '\')" style="cursor:pointer; color:var(--text-muted);" title="Поделиться"></i>' +
-                '<i class="fas fa-compass compass-icon" onclick="centerMap(' + p.location.lat + ', ' + p.location.lng + ')" title="Показать на карте"></i>' +
-                '</div>' +
-                '</div>' +
-                '<h3 style="margin:0 0 5px 0; cursor: pointer;" onclick="showMasterProfile(\'' + p.id + '\')">' + p.name + ' ' + verifiedBadge + '</h3>' +
-                '<div style="font-size:0.85rem; color:#f59e0b; font-weight:bold"><i class="fas fa-star"></i> ' + p.rating + ' <span style="color:#94a3b8; font-weight:400">(' + p.ratingCount + ' отзывов)</span></div>' +
-                '<p style="font-size:0.85rem; color:var(--text-muted); margin:15px 0">' + p.desc + '</p>' +
-                distanceHtml +
-                '<div class="price">' + p.price + ' <span>₽/час</span></div>' +
-                '<button class="btn btn-primary" onclick="openBooking(\'' + p.id + '\', \'' + safeName + '\', ' + p.price + ')">Заказать услугу</button>' +
-                '<button class="btn btn-outline" style="margin-top:10px" onclick="showToast(\'Чат с мастером в разработке\', \'info\')" title="Пока в разработке">Чат с мастером</button>' +
-                '<button class="btn btn-outline btn-sm" style="margin-top:5px;" onclick="openComplaintModal(\'pro\', \'' + p.id + '\')"><i class="fas fa-flag"></i> Пожаловаться</button>';
+            let cardHtml;
+            if (isMobile) {
+                // Мобильная версия: минималистичная карточка-превью
+                cardHtml = `
+                    <div class="card" data-pro-id="${p.id}">
+                        <div class="card-header">
+                            ${avatar}
+                            <div style="flex:1">
+                                <h3>${p.name} ${verifiedBadge}</h3>
+                                <div class="rating">⭐ ${p.rating} <span style="color:var(--text-muted)">(${p.ratingCount} отзывов)</span></div>
+                            </div>
+                            <div style="display:flex; gap:6px;">
+                                <input type="checkbox" class="compare-checkbox" data-id="${p.id}" ${isSelected ? 'checked' : ''} onchange="toggleCompare('${p.id}', this)" title="Выбрать для сравнения">
+                                <i class="fa${isFav ? 's' : 'r'} fa-heart fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${p.id}', this)" title="${isFav ? 'Убрать из избранного' : 'Добавить в избранное'}"></i>
+                            </div>
+                        </div>
+                        <div class="price">${p.price} <span>₽/час</span></div>
+                        <button class="btn btn-primary" onclick="event.stopPropagation(); openBooking('${p.id}', '${safeName}', ${p.price})">Заказать услугу</button>
+                    </div>
+                `;
+            } else {
+                // Десктопная версия: полная карточка
+                let distanceHtml = '';
+                if (userLocation) {
+                    const from = L.latLng(userLocation.lat, userLocation.lng);
+                    const to = L.latLng(p.location.lat, p.location.lng);
+                    const distKm = from.distanceTo(to) / 1000;
+                    distanceHtml = '<div class="distanceHtml" style="font-size:0.8rem; color:var(--text-muted); margin-top:5px">🚗 ' + distKm.toFixed(1) + ' км</div>';
+                }
 
-            card.innerHTML = html;
+                cardHtml = `
+                    <div class="card">
+                        <div class="card-header">
+                            ${avatar}
+                            <span class="category-tag"><i class="fas ${p.icon}"></i> ${p.category}</span>
+                            <div style="display:flex; gap:5px;">
+                                <input type="checkbox" class="compare-checkbox" data-id="${p.id}" ${isSelected ? 'checked' : ''} onchange="toggleCompare('${p.id}', this)" title="Выбрать для сравнения">
+                                <i class="fa${isFav ? 's' : 'r'} fa-heart fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${p.id}', this)" title="${isFav ? 'Убрать из избранного' : 'Добавить в избранное'}"></i>
+                                <i class="fas fa-share-alt" onclick="sharePro('${p.id}', '${safeName}')" style="cursor:pointer; color:var(--text-muted);" title="Поделиться"></i>
+                                <i class="fas fa-compass compass-icon" onclick="centerMap(${p.location.lat}, ${p.location.lng})" title="Показать на карте"></i>
+                            </div>
+                        </div>
+                        <h3 style="margin:0 0 5px 0; cursor: pointer;" onclick="showMasterProfile('${p.id}')">${p.name} ${verifiedBadge}</h3>
+                        <div class="rating">⭐ ${p.rating} <span style="color:var(--text-muted)">(${p.ratingCount} отзывов)</span></div>
+                        <p style="font-size:0.85rem; color:var(--text-muted); margin:15px 0">${p.desc}</p>
+                        ${distanceHtml}
+                        <div class="price">${p.price} <span>₽/час</span></div>
+                        <button class="btn btn-primary" onclick="openBooking('${p.id}', '${safeName}', ${p.price})">Заказать услугу</button>
+                        <button class="btn btn-outline" style="margin-top:10px" onclick="showToast('Чат с мастером в разработке', 'info')" title="Пока в разработке">Чат с мастером</button>
+                        <button class="btn btn-outline btn-sm" style="margin-top:5px;" onclick="openComplaintModal('pro', '${p.id}')"><i class="fas fa-flag"></i> Пожаловаться</button>
+                    </div>
+                `;
+            }
+
+            const cardDiv = document.createElement('div');
+            cardDiv.innerHTML = cardHtml.trim();
+            const card = cardDiv.firstChild;
+            card.style.animationDelay = idx * 0.05 + 's';
+
+            if (isMobile) {
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('.btn, .fav-btn, .compare-checkbox')) return;
+                    showMasterProfile(p.id);
+                });
+            }
+
             list.appendChild(card);
         });
     }
@@ -418,7 +433,6 @@ async function getPros() {
     showRecommendations();
 }
 
-// ==================== ПРОФИЛЬ МАСТЕРА ====================
 function showMasterProfile(proId) {
     const master = pros.find(p => p.id === proId);
     if (!master) return;
@@ -462,7 +476,6 @@ function showMasterProfile(proId) {
     openModal('modal-master-profile');
 }
 
-// ==================== ЖАЛОБЫ ====================
 let currentComplaintTarget = null;
 function openComplaintModal(targetType, targetId) {
     if (!token) { openModal('modal-auth'); return; }
@@ -495,7 +508,6 @@ async function submitComplaint() {
     }
 }
 
-// ==================== РЕКОМЕНДАЦИИ ====================
 function showRecommendations() {
     const lastCategory = localStorage.getItem('lastCategory');
     if (!lastCategory || pros.length === 0) return;
@@ -514,13 +526,11 @@ function showRecommendations() {
     document.getElementById('pros-list').insertAdjacentHTML('beforeend', html);
 }
 
-// ==================== ЦЕНТРИРОВАНИЕ КАРТЫ ====================
 function centerMap(lat, lng) {
     map.setView([lat, lng], 15);
     showToast('Карта центрирована на мастере', 'success');
 }
 
-// ==================== ПОДЕЛИТЬСЯ ====================
 function sharePro(id, name) {
     const url = window.location.origin + '/?pro=' + id;
     navigator.clipboard.writeText(url).then(() => {
@@ -528,7 +538,6 @@ function sharePro(id, name) {
     }).catch(() => showToast('Не удалось скопировать', 'error'));
 }
 
-// ==================== БРОНИРОВАНИЕ ====================
 function openBooking(id, name, price) {
     if (!token) return openModal('modal-auth');
     currentPro = { id, name, price };
@@ -601,7 +610,6 @@ async function confirmBooking() {
     }
 }
 
-// ==================== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ====================
 function showView(v) {
     const oldView = document.querySelector('.view:not(.hidden)');
     const newView = document.getElementById(v === 'pros' ? 'view-pros' : 'view-orders');
@@ -618,7 +626,6 @@ function showView(v) {
     if (v === 'orders') getOrders();
 }
 
-// ==================== ПОЛУЧЕНИЕ ЗАКАЗОВ ====================
 async function getOrders() {
     if (!token) {
         document.getElementById('orders-list').innerHTML = '<p>Войдите для просмотра истории</p>';
@@ -639,12 +646,9 @@ async function getOrders() {
 
         orders.reverse().forEach(o => {
             let actions = '';
-
             if (o.status === 'В процессе') {
                 actions = '<button class="btn btn-outline" style="width:100%; margin-top:10px" onclick="openCompleteModal(\'' + o.id + '\')">Завершить</button>';
             }
-            // Кнопка "Скачать квитанцию" для выполненных заказов удалена по требованию
-
             let statusColor = '';
             if (o.status === 'Выполнен') {
                 statusColor = 'color: #10b981;';
@@ -653,7 +657,6 @@ async function getOrders() {
             } else {
                 statusColor = 'color: var(--primary);';
             }
-
             const cardHtml = '<div class="card visible">' +
                 '<div style="font-size:0.7rem; font-weight:800; margin-bottom:10px; text-transform:uppercase; ' + statusColor + '">' + o.status + '</div>' +
                 '<h3 style="margin:0">' + o.proName + '</h3>' +
@@ -676,7 +679,6 @@ async function getOrders() {
     }
 }
 
-// ==================== УВЕДОМЛЕНИЯ ====================
 let lastNotifCount = 0;
 
 async function fetchNotifications() {
@@ -738,7 +740,6 @@ async function showNotifications() {
 
     notifs.forEach(n => {
         let icon = '', text = '', details = '';
-
         switch (n.type) {
             case 'new_order':
                 icon = '🔔';
@@ -774,7 +775,6 @@ async function showNotifications() {
                 icon = '📢';
                 text = n.type;
         }
-
         html += '<div style="padding:10px; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; gap:10px;">' +
             '<span style="font-size:1.5rem;">' + icon + '</span>' +
             '<div style="flex:1;">' +
@@ -797,7 +797,6 @@ async function showNotifications() {
     await fetchNotifications();
 }
 
-// ==================== ЧАТ (ЗАГЛУШКА) ====================
 function openChat(proId, proName) {
     if (!token) return openModal('modal-auth');
     document.getElementById('chat-with').innerText = 'Чат с ' + proName;
@@ -841,7 +840,6 @@ function sendMessage() {
     input.value = '';
 }
 
-// ==================== ЗАВЕРШЕНИЕ ЗАКАЗА (без фото) ====================
 function openCompleteModal(orderId) {
     currentOrderId = orderId;
     const modal = document.createElement('div');
@@ -938,7 +936,6 @@ async function submitComplete() {
     }
 }
 
-// ==================== ГАМБУРГЕР-МЕНЮ ====================
 function toggleHamburgerMenu() {
     const menu = document.getElementById('hamburger-menu');
     menu.classList.toggle('hidden');
@@ -961,7 +958,6 @@ function updateMenuAuthText() {
 }
 updateMenuAuthText();
 
-// ==================== ТЁМНАЯ ТЕМА ====================
 function toggleTheme() {
     const isDark = document.body.hasAttribute('data-theme');
     if (isDark) {
@@ -983,7 +979,6 @@ if (savedTheme === 'dark') {
     document.getElementById('menu-theme-text').innerText = 'Светлая тема';
 }
 
-// ==================== ФУНКЦИИ МЕНЮ ====================
 function openCompareFromMenu() {
     compareMasters();
     toggleHamburgerMenu();
@@ -1047,7 +1042,6 @@ function showAbout() {
     toggleHamburgerMenu();
 }
 
-// ==================== СРАВНЕНИЕ МАСТЕРОВ ====================
 document.getElementById('compare-btn').onclick = compareMasters;
 
 function compareMasters() {
@@ -1101,17 +1095,14 @@ function closeCompareModal() {
     document.getElementById('compare-modal').style.display = 'none';
 }
 
-// ==================== ТЁМНАЯ ТЕМА (кнопка в шапке) ====================
 document.getElementById('theme-toggle').onclick = toggleTheme;
 
-// ==================== КНОПКА "НАВЕРХ" ====================
 window.addEventListener('scroll', () => {
     const btn = document.getElementById('scrollTop');
     if (btn) btn.style.display = window.scrollY > 300 ? 'block' : 'none';
 });
 document.getElementById('scrollTop').onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-// ==================== УПРАВЛЕНИЕ САЙДБАРОМ ====================
 function toggleSidebar() {
     document.querySelector('.sidebar').classList.toggle('open');
 }
@@ -1132,7 +1123,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// ==================== СВАЙП ДЛЯ ЗАКРЫТИЯ САЙДБАРА ====================
 let touchstartX = 0;
 let touchendX = 0;
 const sidebarEl = document.querySelector('.sidebar');
@@ -1148,7 +1138,6 @@ if (sidebarEl) {
     });
 }
 
-// ==================== ИНДИКАТОР ПРОКРУТКИ ====================
 const prosList = document.getElementById('pros-list');
 if (prosList) {
     prosList.addEventListener('scroll', () => {
@@ -1157,13 +1146,11 @@ if (prosList) {
     });
 }
 
-// ==================== АДМИН-ПАНЕЛЬ ====================
 if (token && localStorage.getItem('role') === 'admin') {
     const adminItem = document.getElementById('admin-menu-item');
     if (adminItem) adminItem.classList.remove('hidden');
 }
 
-// ==================== ИНИЦИАЛИЗАЦИЯ ====================
 if (token) {
     const nameSpan = document.querySelector('#authBtn span');
     if (nameSpan) nameSpan.innerText = localStorage.getItem('uname') || 'Профиль';
@@ -1184,5 +1171,14 @@ if (params.has('minRating')) document.getElementById('f-rate').value = params.ge
 if (params.has('search')) document.getElementById('main-search').value = params.get('search');
 if (params.has('verified')) document.getElementById('f-verified').checked = params.get('verified') === 'true';
 if (params.has('sort')) document.getElementById('f-sort').value = params.get('sort');
+
+// Обработчик изменения размера окна для перерисовки карточек
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        getPros();
+    }, 300);
+});
 
 getPros();

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>PROMarket — Админ-панель</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -55,6 +55,7 @@
             margin-bottom: 30px;
             border-bottom: 1px solid rgba(159, 122, 234, 0.3);
             padding-bottom: 20px;
+            flex-wrap: wrap;
         }
 
         .admin-header i {
@@ -234,6 +235,7 @@
 
         .table-container {
             max-height: 500px;
+            overflow-x: auto;
             overflow-y: auto;
             border-radius: 24px;
             background: #1a1a2e;
@@ -245,6 +247,7 @@
 
         .table-container::-webkit-scrollbar {
             width: 8px;
+            height: 8px;
         }
 
         .table-container::-webkit-scrollbar-track {
@@ -260,6 +263,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 600px;
         }
 
         th {
@@ -456,6 +460,101 @@
             font-size: 0.9rem;
             border-top: 1px solid rgba(159, 122, 234, 0.2);
             padding-top: 20px;
+        }
+
+        /* ========== МОБИЛЬНАЯ АДАПТАЦИЯ АДМИНКИ ========== */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            .admin-container {
+                padding: 20px;
+            }
+            .admin-header h1 {
+                font-size: 1.8rem;
+            }
+            .admin-header i {
+                font-size: 2rem;
+            }
+            .tabs {
+                gap: 8px;
+            }
+            .tab-btn {
+                padding: 8px 16px;
+                font-size: 0.8rem;
+            }
+            .tab-btn i {
+                font-size: 1rem;
+            }
+            .search-section {
+                flex-direction: column;
+            }
+            .search-box, .filter-select {
+                width: 100%;
+                min-width: auto;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .stat-card {
+                padding: 15px;
+            }
+            .stat-value {
+                font-size: 1.5rem;
+            }
+            .stat-label {
+                font-size: 0.7rem;
+            }
+            .table-container {
+                max-height: 400px;
+                -webkit-overflow-scrolling: touch;
+            }
+            table {
+                min-width: 500px;
+            }
+            th, td {
+                padding: 10px;
+                font-size: 0.8rem;
+            }
+            .btn-sm {
+                padding: 4px 8px;
+                font-size: 0.7rem;
+            }
+            .modal-card {
+                padding: 20px;
+                width: 95%;
+            }
+            .profile-info p {
+                font-size: 0.9rem;
+                gap: 8px;
+            }
+            .profile-actions {
+                flex-direction: column;
+            }
+            .profile-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .chart-container {
+                height: 200px;
+            }
+            .admin-footer {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .tab-btn {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+            .tab-btn i {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -773,7 +872,6 @@
         let portfolio = [];
         let complaints = [];
 
-        // --- Показать вкладку ---
         function showTab(tab) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -788,7 +886,6 @@
             else if (tab === 'stats') loadStats();
         }
 
-        // --- Загрузка данных ---
         async function loadUsers() {
             try {
                 const res = await fetch('/api/admin/users', { headers: { 'Authorization': 'Bearer ' + token } });
@@ -842,7 +939,6 @@
             } catch (e) { console.error(e); return []; }
         }
 
-        // --- Пользователи ---
         function filterUsers() {
             const search = document.getElementById('user-search').value.toLowerCase();
             const roleFilter = document.getElementById('user-role-filter').value;
@@ -915,7 +1011,6 @@
             document.getElementById('profileModal').classList.remove('active');
         }
 
-        // --- Заказы ---
         function filterOrders() {
             const search = document.getElementById('order-search').value.toLowerCase();
             const statusFilter = document.getElementById('order-status-filter').value;
@@ -940,7 +1035,6 @@
             `).join('');
         }
 
-        // --- Промокоды ---
         function renderPromos(promosList) {
             const tbody = document.querySelector('#promos-table tbody');
             tbody.innerHTML = promosList.map(p => `
@@ -1014,7 +1108,6 @@
             document.getElementById('promoModal').classList.remove('active');
         }
 
-        // --- Отзывы ---
         function filterReviews() {
             const search = document.getElementById('review-search').value.toLowerCase();
             const moderatedFilter = document.getElementById('review-moderated-filter').value;
@@ -1031,20 +1124,21 @@
                 const client = users.find(u => u.id === r.fromUserId)?.name || 'Аноним';
                 const pro = users.find(u => u.id === r.toUserId)?.name || 'Неизвестно';
                 return `
-                <tr>
-                    <td>${r.id}</td>
-                    <td>${client}</td>
-                    <td>${pro}</td>
-                    <td>${r.rating}</td>
-                    <td>${r.text.substring(0,30)}...</td>
-                    <td>${r.moderated ? '✅' : '❌'}</td>
-                    <td>
-                        <button class="btn btn-info btn-sm" onclick="moderateReview('${r.id}', true)">Одобрить</button>
-                        <button class="btn btn-warning btn-sm" onclick="moderateReview('${r.id}', false)">Скрыть</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteReview('${r.id}')"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            `}).join('');
+                    <tr>
+                        <td>${r.id}</td>
+                        <td>${client}</td>
+                        <td>${pro}</td>
+                        <td>${r.rating}</td>
+                        <td>${r.text.substring(0,30)}...</td>
+                        <td>${r.moderated ? '✅' : '❌'}</td>
+                        <td>
+                            <button class="btn btn-info btn-sm" onclick="moderateReview('${r.id}', true)">Одобрить</button>
+                            <button class="btn btn-warning btn-sm" onclick="moderateReview('${r.id}', false)">Скрыть</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteReview('${r.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         async function moderateReview(id, moderated) {
@@ -1062,7 +1156,6 @@
             loadReviews().then(() => filterReviews());
         }
 
-        // --- Портфолио ---
         function filterPortfolio() {
             const search = document.getElementById('portfolio-search').value.toLowerCase();
             const filtered = portfolio.filter(p => 
@@ -1078,18 +1171,19 @@
             tbody.innerHTML = portfolioList.map(p => {
                 const master = users.find(u => u.id === p.proId)?.name || 'Неизвестно';
                 return `
-                <tr>
-                    <td>${p.id}</td>
-                    <td>${master}</td>
-                    <td>${p.title}</td>
-                    <td>${p.description?.substring(0,30)}...</td>
-                    <td>${p.photos ? p.photos.length : 0}</td>
-                    <td>${new Date(p.createdAt).toLocaleDateString()}</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm" onclick="deletePortfolioItem('${p.id}')"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            `}).join('');
+                    <tr>
+                        <td>${p.id}</td>
+                        <td>${master}</td>
+                        <td>${p.title}</td>
+                        <td>${p.description?.substring(0,30)}...</td>
+                        <td>${p.photos ? p.photos.length : 0}</td>
+                        <td>${new Date(p.createdAt).toLocaleDateString()}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="deletePortfolioItem('${p.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         async function deletePortfolioItem(id) {
@@ -1098,7 +1192,6 @@
             loadPortfolio().then(() => filterPortfolio());
         }
 
-        // --- Жалобы ---
         function filterComplaints() {
             const search = document.getElementById('complaint-search').value.toLowerCase();
             const statusFilter = document.getElementById('complaint-status-filter').value;
@@ -1114,21 +1207,22 @@
             tbody.innerHTML = complaintsList.map(c => {
                 const fromUser = users.find(u => u.id === c.fromUserId)?.name || 'Неизвестно';
                 return `
-                <tr>
-                    <td>${c.id}</td>
-                    <td>${fromUser}</td>
-                    <td>${c.targetType}</td>
-                    <td>${c.targetId}</td>
-                    <td>${c.reason}</td>
-                    <td>${c.description || ''}</td>
-                    <td><span class="complaint-badge ${c.status}">${c.status}</span></td>
-                    <td>${new Date(c.createdAt).toLocaleDateString()}</td>
-                    <td>
-                        <button class="btn btn-success btn-sm" onclick="resolveComplaint('${c.id}', 'resolved')">Решить</button>
-                        <button class="btn btn-warning btn-sm" onclick="resolveComplaint('${c.id}', 'dismissed')">Отклонить</button>
-                    </td>
-                </tr>
-            `}).join('');
+                    <tr>
+                        <td>${c.id}</td>
+                        <td>${fromUser}</td>
+                        <td>${c.targetType}</td>
+                        <td>${c.targetId}</td>
+                        <td>${c.reason}</td>
+                        <td>${c.description || ''}</td>
+                        <td><span class="complaint-badge ${c.status}">${c.status}</span></td>
+                        <td>${new Date(c.createdAt).toLocaleDateString()}</td>
+                        <td>
+                            <button class="btn btn-success btn-sm" onclick="resolveComplaint('${c.id}', 'resolved')">Решить</button>
+                            <button class="btn btn-warning btn-sm" onclick="resolveComplaint('${c.id}', 'dismissed')">Отклонить</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         async function resolveComplaint(id, status) {
@@ -1140,7 +1234,6 @@
             loadComplaints().then(() => filterComplaints());
         }
 
-        // --- Уведомления ---
         async function sendNotification() {
             const role = document.getElementById('notify-role').value;
             const message = document.getElementById('notify-message').value;
@@ -1156,7 +1249,6 @@
             }
         }
 
-        // --- Статистика и графики ---
         async function loadStats() {
             const u = await loadUsers();
             const o = await loadOrders();
@@ -1213,7 +1305,6 @@
             }
         }
 
-        // --- Инициализация ---
         (async () => {
             await loadUsers();
             filterUsers();
